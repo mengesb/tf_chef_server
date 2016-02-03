@@ -6,7 +6,7 @@ variable "aws_private_key_file" {}
 variable "aws_vpc_id" {}
 variable "aws_subnet_id" {}
 variable "aws_ami_user" {}
-varaible "aws_ami_id" {
+variable "aws_ami_id" {
   default = "ami-45844401"
 }
 variable "aws_flavor" {
