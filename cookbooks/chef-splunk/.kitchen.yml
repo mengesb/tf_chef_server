@@ -1,0 +1,135 @@
+driver:
+  name: vagrant
+  customize:
+    memory: 512
+
+provisioner:
+  name: chef_zero
+  data_bags_path: "test/fixtures/data_bags"
+
+platforms:
+  - name: centos-6.7
+  - name: centos-7.1
+  - name: debian-7.8
+    run_list: apt::default
+  - name: debian-8.1
+    run_list: apt::default
+  - name: fedora-21
+  - name: ubuntu-12.04
+  - name: ubuntu-14.04
+  - name: omnios-r151006c
+    driver:
+      box: omnios-r151006c
+      box_url: http://omnios.omniti.com/media/OmniOS_r151006c-r1.box
+
+suites:
+  - name: client
+    run_list:
+      - recipe[chef-splunk::default]
+      - recipe[test::default]
+    attributes:
+      dev_mode: true
+      splunk:
+        accept_license: true
+
+  - name: client-inputs-outputs
+    run_list:
+      - recipe[chef-splunk::default]
+      - recipe[test::default]
+    attributes:
+      dev_mode: true
+      splunk:
+        accept_license: true
+        outputs_conf:
+          sslCommonNameToCheck: sslCommonName
+          sslCertPath: $SPLUNK_HOME/etc/certs/cert.pem
+          sslPassword: password
+          sslRootCAPath: $SPLUNK_HOME/etc/certs/cacert.pem
+          sslVerifyServerCert: false
+        inputs_conf:
+          host: localhost
+          ports:
+            - port_num: 123123
+              config:
+                connection_host: dns
+                sourcetype: syslog
+                source: tcp:123123
+
+  - name: server-runas-root
+    run_list:
+      - recipe[chef-splunk::default]
+    attributes:
+      dev_mode: true
+      splunk:
+        server:
+          runasroot: true
+        is_server: true
+        accept_license: true
+        ssl_options:
+          enable_ssl: true
+
+  - name: server-runas-splunk
+    run_list:
+      - recipe[chef-splunk::default]
+    attributes:
+      dev_mode: true
+      splunk:
+        server:
+          runasroot: false
+        is_server: true
+        accept_license: true
+        ssl_options:
+          enable_ssl: true
+        web_port: 8443
+
+  - name: disabled
+    run_list:
+      - recipe[chef-splunk::default]
+    attributes:
+      splunk:
+        disabled: true
+
+  - name: upgrade_client
+    run_list:
+      - recipe[chef-splunk::default]
+      - recipe[chef-splunk::upgrade]
+    attributes:
+      dev_mode: true
+      splunk:
+        accept_license: true
+        upgrade_enabled: true
+
+  - name: upgrade_server
+    run_list:
+      - recipe[chef-splunk::default]
+      - recipe[chef-splunk::upgrade]
+    attributes:
+      dev_mode: true
+      splunk:
+        accept_license: true
+        upgrade_enabled: true
+        is_server: true
+
+  - name: server_lwrps
+    run_list:
+      - recipe[chef-splunk::default]
+      - recipe[test::default]
+    attributes:
+      dev_mode: true
+      splunk:
+        server:
+          runasroot: false
+        accept_license: true
+        is_server: true
+
+  - name: client_lwrps
+    run_list:
+      - recipe[chef-splunk::default]
+      - recipe[test::default]
+    attributes:
+      dev_mode: true
+      splunk:
+        server:
+          runasroot: false
+        accept_license: true
+        is_server: false

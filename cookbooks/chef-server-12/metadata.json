@@ -1,0 +1,36 @@
+{
+  "name": "chef-server-12",
+  "description": "Installs/Configures chef-server-12",
+  "long_description": "chef-server-12 Cookbook\n===============================\n\nThis cookbook install and maintain a Chef Server v12.\n\nAdditionally it can setup the initial configuration for Delivery.\n\nPrerequisits\n-----\nThis cookbook need an secret key to be able to handle the PEM key\nin secure mode. If you are using Test Kitchen the key already exist.\n\nIf you want to regenerate the existing key run:\n```\n$ openssl rand -base64 512 > test/integration/default/encrypted_data_bag_secret\n```\nIf you are using `chef-solo` you have to manually create the secret key and\nconfigure `solo.rb`.\n\nPlatform\n-----\nChef Server v12 packages are available for the following platforms:\n\n* Redhat 6.5 64-bit\n* Centos 6.5 64-bit\n* Ubuntu 12.04, 12.10 64-bit\n\nUsage Solo Mode\n-----\nThis cookbook can be used on `solo` mode to spinup a Chef Server v12.\n\nSteps:\n\n- Transfer this cookbook to the node and ensure that it has chef installed. `/etc/chef/cookbooks/chef-server-12`\n- Create a secret key. (Only if you need the Delivery Setup Process)\n\n```\n    # openssl rand -base64 512 > /etc/chef/encrypted_data_bag_secret\n```\n- Configure `/etc/chef/solo.rb`\n```\ncookbook_path \"/etc/chef/cookbooks\"\nencrypted_data_bag_secret \"/etc/chef/encrypted_data_bag_secret\"\nhttp_proxy ENV['http_proxy']\nhttps_proxy ENV['https_proxy']\n```\n- Create a `/etc/chef/dna.json`\n```\n{\n  \"run_list\" : [\"chef-server-12::default\"],\n\n  /* This will override the default api_fqdn attribute from the cookbook */\n  /* Use it only if you have multiple ip addresses or if you want to set */\n  /* the hostname/FQDN on it. */\n\n  \"chef-server-12\" : {\n    \"api_fqdn\":\"ANOTHER_IP_ADDRESS\"\n  }\n}\n```\n- Run `chef-solo`\n```\n    # chef-solo --config /etc/chef/solo.rb --json-attributes /etc/chef/dna.json --log_level info\n```\n\nUsage Test-Kitchen Mode\n-----\nYou basically need to run:\n\n    kitchen converge [PLATFORM_YOU_WANT]\n\nContributing\n------------\nTODO: (optional) If this is a public cookbook, detail the process for contributing. If this is a private cookbook, remove this section.\n\ne.g.\n1. Fork the repository on Github\n2. Create a named feature branch (like `add_component_x`)\n3. Write your change\n4. Write tests for your change (if applicable)\n5. Run the tests, ensuring they all pass\n6. Submit a Pull Request using Github\n\nLicense and Authors\n-------------------\n\n* Author: Salim [Afiune](http://github.com/afiune/) <afiune@getchef.com>\n\nCopyright 2014, Chef Software, Inc\n\nLicensed under the Apache License, Version 2.0 (the \"License\");\nyou may not use this file except in compliance with the License.\nYou may obtain a copy of the License at\n\n    http://www.apache.org/licenses/LICENSE-2.0\n\nUnless required by applicable law or agreed to in writing, software\ndistributed under the License is distributed on an \"AS IS\" BASIS,\nWITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\nSee the License for the specific language governing permissions and\nlimitations under the License.\n",
+  "maintainer": "Chef Software Inc",
+  "maintainer_email": "afiune@chef.io",
+  "license": "Apache 2.0",
+  "platforms": {
+    "ubuntu": ">= 0.0.0",
+    "centos": ">= 0.0.0",
+    "redhat": ">= 0.0.0"
+  },
+  "dependencies": {
+    "chef-ingredient": ">= 0.0.0",
+    "hostsfile": ">= 0.0.0"
+  },
+  "recommendations": {
+  },
+  "suggestions": {
+  },
+  "conflicting": {
+  },
+  "providing": {
+  },
+  "replacing": {
+  },
+  "attributes": {
+  },
+  "groupings": {
+  },
+  "recipes": {
+  },
+  "version": "0.1.8",
+  "source_url": "",
+  "issues_url": ""
+}
