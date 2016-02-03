@@ -64,8 +64,7 @@ module "chef-server-ami" {
   arch = "${var.arch}"
 }
 resource "aws_instance" "chef-server" {
-  #ami = "${module.chef-server-ami.ami_id}"
-  ami = "ami-45844401"
+  ami = "${module.chef-server-ami.ami_id}"
   count = "${var.aws_instance_count}"
   instance_type = "${var.aws_flavor}"
   subnet_id = "${var.chef_server_aws_subnet_id}"
