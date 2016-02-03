@@ -9,5 +9,5 @@ output "security_group_id" {
   value = "${aws_security_group.chef-server.id}"
 }
 output "chef_server_url" {
-  value = "https://${aws_instance.chef-server.public_ip}/organizations/${var.org}"
+  value = "https://${aws_instance.chef-server.public_ip}/organizations/${var.chef_org}"
 }
