@@ -2,7 +2,7 @@
 resource "aws_security_group" "chef-server" {
   name = "chef-server"
   description = "Chef Server"
-  vpc_id = "${var.chef_server_aws_vpc_id}"
+  vpc_id = "${var.aws_vpc_id}"
   tags = {
     Name = "chef-server security group"
   }
@@ -53,48 +53,41 @@ resource "aws_security_group_rule" "chef-server_allow_all" {
   security_group_id = "${aws_security_group.chef-server.id}"
 }
 provider "aws" {
-  access_key = "${var.aws_access_key_id}"
-  secret_key = "${var.aws_secret_access_key}"
-  region = "${var.aws_default_region}"
-}
-module "chef-server-ami" {
-  source = "./chef-server-ami"
-  region = "${var.aws_default_region}"
-  dist = "${var.dist}"
-  arch = "${var.arch}"
+  access_key = "${var.aws_access_key}"
+  secret_key = "${var.aws_secret_key}"
+  region = "${var.aws_region}"
 }
 resource "aws_instance" "chef-server" {
-  ami = "${module.chef-server-ami.ami_id}"
+  ami = "${var.aws_ami_id}"
   count = "${var.aws_instance_count}"
   instance_type = "${var.aws_flavor}"
-  subnet_id = "${var.chef_server_aws_subnet_id}"
+  subnet_id = "${var.aws_subnet_id}"
   vpc_security_group_ids = ["${aws_security_group.chef-server.id}"]
   key_name = "${var.aws_key_name}"
   tags {
-    Name = "${format("%s-%02d-%s", var.aws_tag_name, count.index + 1, var.org)}"
+    Name = "${format("%s-%02d-%s", var.aws_instance_name, count.index + 1, var.chef_org)}"
   }
   root_block_device = {
     delete_on_termination = true
   }
   provisioner "file" {
     connection {
-      user = "${module.chef-server-ami.username}"
-      private_key = "${file("${var.private_key_file}")}"
+      user = "${var.aws_ami_user}"
+      private_key = "${file("${var.aws_private_key_file}")}"
     }
     source = "cookbooks"
     destination = "/tmp"
   }
   provisioner "remote-exec" {
     connection {
-      user = "${module.chef-server-ami.username}"
-      private_key = "${file("${var.private_key_file}")}"
+      user = "${var.aws_ami_user}"
+      private_key = "${file("${var.aws_private_key_file}")}"
     }
     inline = [
       "sudo iptables -A INPUT -p tcp -m multiport --dports 80,443,9683 -j ACCEPT",
       "sudo iptables -A INPUT -p tcp --dport 10000:10003 -j ACCEPT",
       "sudo service iptables save",
       "sudo service iptables restart",
-      "sudo ${module.chef-server-ami.packager} install -y tcpdump git curl wget",
       "curl -sLO https://www.chef.io/chef/install.sh > /dev/null",
       "sudo bash ./install.sh -P chefdk -n",
       "sudo rm install.sh",
