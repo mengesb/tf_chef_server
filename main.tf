@@ -70,24 +70,22 @@ resource "aws_instance" "chef-server" {
   root_block_device = {
     delete_on_termination = true
   }
+  connection {
+    user = "${var.aws_ami_user}"
+    private_key = "${var.aws_private_key_file}"
+  }
+  # TODO: Remove this; replace with @afiune code
   provisioner "file" {
-    connection {
-      user = "${var.aws_ami_user}"
-      private_key = "${file("${var.aws_private_key_file}")}"
-    }
     source = "cookbooks"
     destination = "/tmp"
   }
   provisioner "remote-exec" {
-    connection {
-      user = "${var.aws_ami_user}"
-      private_key = "${file("${var.aws_private_key_file}")}"
-    }
     inline = [
       "sudo iptables -A INPUT -p tcp -m multiport --dports 80,443,9683 -j ACCEPT",
       "sudo iptables -A INPUT -p tcp --dport 10000:10003 -j ACCEPT",
       "sudo service iptables save",
       "sudo service iptables restart",
+      "[[ -x /usr/sbin/apt-get ]] && apt-get install -y git || yum install -y git",
       "curl -sLO https://www.chef.io/chef/install.sh > /dev/null",
       "sudo bash ./install.sh -P chefdk -n",
       "sudo rm install.sh",
