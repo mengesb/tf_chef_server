@@ -36,8 +36,8 @@ These resources will incur charges on your AWS bill. It is your responsibility t
 
 ## Contributors
 
-* @mengesb
-* @afiune
+* [Brian Menges](https://github.com/mengesb) <[mengesb@gmail.com](mengesb@gmail.com)>
+* [Salim Afiune](https://github.com/afiune)
 
 ## Contributing
 
