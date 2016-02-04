@@ -8,11 +8,10 @@ Terraform module to setup a CHEF server in standalone mode. Nothing spectacular 
 * You will be creating your own VPC, subnet and handle networking/routing
 * Uses a public IP
 * Default security group implementation
-** Open global ports:
-*** 22/tcp: SSH
-*** 443/tcp: HTTPS
-*** 80/tcp: HTTP
-*** 10000-10003: CHEF Push Jobs
+  * 22/tcp: SSH
+  * 443/tcp: HTTPS
+  * 80/tcp: HTTP
+  * 10000-10003: CHEF Push Jobs
 * Understand Terraform and ability to read the source
 
 ## Supported OSes
