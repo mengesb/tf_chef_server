@@ -1,11 +1,27 @@
 # tf_aws_chef_server
-Terraform module to setup a CHEF server
+Terraform module to setup a CHEF server in standalone mode. Nothing spectacular here and a very simple implementation. Once this is up and running, recommend you use CHEF to configure your CHEF server to suit your needs.
 
 ## Assumptions
 
 * Uses AWS
-* You will be creating your own VPC and Subnet
+* Can find the correct AMI for your region
+* You will be creating your own VPC, subnet and handle networking/routing
+* Uses a public IP
 * Default security group implementation
+** Open global ports:
+*** 22/tcp: SSH
+*** 443/tcp: HTTPS
+*** 80/tcp: HTTP
+*** 10000-10003: CHEF Push Jobs
+* Understand Terraform and ability to read the source
+
+## Supported OSes
+All supported OSes are 64-bit and HVM (though PV should be supported)
+
+* Ubuntu 12.04 LTS
+* Ubuntu 14.04 LTS
+* CentOS 6 (Default)
+* CentOS 7
 
 ## AWS
 
