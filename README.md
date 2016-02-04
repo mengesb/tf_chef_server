@@ -21,7 +21,7 @@ These resources will incur charges on your AWS bill. It is your responsibility t
 * `aws_vpc_id`: The AWS id of the VPC to use. Example: `vpc-ffffffff`
 * `aws_subnet_id`: The AWS id of the subnet to use. Example: `subnet-ffffffff`
 * `aws_ami_user`: The user for the AMI you're using. Example: `centos`
-* `aws_ami_id`: The AWS id of the AMI. Default: `ami-45844401` [CentOS 6 (x86_64) - with Updates HVM (us-west-1)|https://aws.amazon.com/marketplace/pp/B00NQAYLWO]
+* `aws_ami_id`: The AWS id of the AMI. Default: `ami-45844401` [CentOS 6 (x86_64) - with Updates HVM (us-west-1)](https://aws.amazon.com/marketplace/pp/B00NQAYLWO)
 * `aws_flavor`: The AWS instance type. Default: `c3.xlarge`
 * `aws_instance_name`: The AWS tag for Name. Default: `chef-server` will result in a Name tag of `${var.aws_instance_name}-${var.aws_instance_count}-${var.chef_org}`
 * `aws_instance_count`: The number of AWS instances to deploy. Deafult: `1`, DO NOT CHANGE!
@@ -45,8 +45,8 @@ Please understand that this is a work in progress and is subject to change rapid
 
 ## `CHANGELOG`
 
-Please refer to the [`CHANGELOG.md`|CHANGELOG.md]
+Please refer to the [`CHANGELOG.md`](CHANGELOG.md)
 
 ## License
 
-This is licensed undert [the Apache 2.0 license|https://www.apache.org/licenses/LICENSE-2.0].
+This is licensed undert [the Apache 2.0 license](https://www.apache.org/licenses/LICENSE-2.0).
