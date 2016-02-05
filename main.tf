@@ -64,7 +64,7 @@ resource "aws_instance" "chef-server" {
   subnet_id = "${var.aws_subnet_id}"
   vpc_security_group_ids = ["${aws_security_group.chef-server.id}"]
   key_name = "${var.aws_key_name}"
-  tags {
+  tags = {
     Name = "${format("%s-%02d-%s", var.aws_instance_name, count.index + 1, var.chef_org)}"
   }
   root_block_device = {
@@ -76,8 +76,15 @@ resource "aws_instance" "chef-server" {
   }
   provisioner "remote-exec" {
     inline = [
+      "sudo iptables -F",
+      "sudo iptables -A INPUT -m state --state RELATED,ESTABLISHED -j ACCEPT",
+      "sudo iptables -A INPUT -p icmp -j ACCEPT",
+      "sudo iptables -A INPUT -i lo -j ACCEPT",
+      "sudo iptables -A INPUT -p tcp -m state --state NEW -m tcp --dport 22 -j ACCEPT",
       "sudo iptables -A INPUT -p tcp -m multiport --dports 80,443,9683 -j ACCEPT",
       "sudo iptables -A INPUT -p tcp --dport 10000:10003 -j ACCEPT",
+      "sudo iptables -A INPUT -j REJECT --reject-with icmp-host-prohibited",
+      "sudo iptables -A FORWARD -j REJECT --reject-with icmp-host-prohibited",
       "sudo service iptables save",
       "sudo service iptables restart",
       "[[ -x /usr/sbin/apt-get ]] && sudo apt-get install -y git || sudo yum install -y git",
@@ -98,15 +105,14 @@ resource "aws_instance" "chef-server" {
       "sudo chef-server-ctl install opscode-push-jobs-server",
       "sudo chef-server-ctl reconfigure",
       "sudo opscode-push-jobs-server reconfigure",
-      "sudo chef-server-ctl reconfigure",
-      "sudo chef exec chef-client -z -o chef-server-12"
+      "sudo chef-server-ctl reconfigure"
     ]
   }
   provisioner "local-exec" {
-    command = "scp -i ${var.aws_private_key_file} ${var.aws_ami_user}@${aws_instance.chef-server.public_ip}:/tmp/${var.chef_username}.pem /tmp/${var.chef_username}.pem"
+    command = "scp -o stricthostkeychecking=no -i ${var.aws_private_key_file} ${var.aws_ami_user}@${aws_instance.chef-server.public_ip}:/tmp/${var.chef_username}.pem /tmp/${var.chef_username}.pem"
   }
   provisioner "local-exec" {
-    command = "scp -i ${var.aws_private_key_file} ${var.aws_ami_user}@${aws_instance.chef-server.public_ip}:/tmp/${var.chef_org}-validator.pem /tmp/${var.chef_org}-validator.pem"
+    command = "scp -o stricthostkeychecking=no -i ${var.aws_private_key_file} ${var.aws_ami_user}@${aws_instance.chef-server.public_ip}:/tmp/${var.chef_org}-validator.pem /tmp/${var.chef_org}-validator.pem"
   }
 }
 
