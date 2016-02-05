@@ -64,7 +64,7 @@ resource "aws_instance" "chef-server" {
   subnet_id = "${var.aws_subnet_id}"
   vpc_security_group_ids = ["${aws_security_group.chef-server.id}"]
   key_name = "${var.aws_key_name}"
-  tags {
+  tags = {
     Name = "${format("%s-%02d-%s", var.aws_instance_name, count.index + 1, var.chef_org)}"
   }
   root_block_device = {
@@ -74,24 +74,45 @@ resource "aws_instance" "chef-server" {
     user = "${var.aws_ami_user}"
     private_key = "${var.aws_private_key_file}"
   }
-  # TODO: Remove this; replace with @afiune code
-  provisioner "file" {
-    source = "cookbooks"
-    destination = "/tmp"
-  }
   provisioner "remote-exec" {
     inline = [
+      "sudo iptables -F",
+      "sudo iptables -A INPUT -m state --state RELATED,ESTABLISHED -j ACCEPT",
+      "sudo iptables -A INPUT -p icmp -j ACCEPT",
+      "sudo iptables -A INPUT -i lo -j ACCEPT",
+      "sudo iptables -A INPUT -p tcp -m state --state NEW -m tcp --dport 22 -j ACCEPT",
       "sudo iptables -A INPUT -p tcp -m multiport --dports 80,443,9683 -j ACCEPT",
       "sudo iptables -A INPUT -p tcp --dport 10000:10003 -j ACCEPT",
+      "sudo iptables -A INPUT -j REJECT --reject-with icmp-host-prohibited",
+      "sudo iptables -A FORWARD -j REJECT --reject-with icmp-host-prohibited",
       "sudo service iptables save",
       "sudo service iptables restart",
-      "[[ -x /usr/sbin/apt-get ]] && apt-get install -y git || yum install -y git",
-      "curl -sLO https://www.chef.io/chef/install.sh > /dev/null",
-      "sudo bash ./install.sh -P chefdk -n",
-      "sudo rm install.sh",
-      "cd /tmp",
-      "sudo chef exec chef-client -z -o chef-server-12"
+      "[[ -x /usr/sbin/apt-get ]] && sudo apt-get install -y git || sudo yum install -y git",
+      "curl -s https://packagecloud.io/install/repositories/chef/stable/script.deb.sh -o script.deb.sh",
+      "curl -s https://packagecloud.io/install/repositories/chef/stable/script.rpm.sh -o script.rpm.sh",
+      "[[ -x /usr/sbin/apt-get ]] && sudo bash script.deb.sh || sudo bash script.rpm.sh",
+      "[[ -x /usr/sbin/apt-get ]] && sudo apt-get install -y chef-server-core || sudo yum install -y chef-server-core",
+      "rm -f script.*.sh",
+      "sudo chef-server-ctl reconfigure",
+      "sudo chef-server-ctl user-create ${var.chef_username} ${var.chef_user_firstname} ${var.chef_user_lastname} ${var.chef_user_email} ${base64encode(aws_instance.chef-server.id)} -f /tmp/${var.chef_username}.pem",
+      "sudo chef-server-ctl org-create ${var.chef_org} '${var.chef_org_long}' --association_user ${var.chef_username} --filename /tmp/${var.chef_org}-validator.pem",
+      "sudo chef-server-ctl install opscode-reporting",
+      "sudo chef-server-ctl reconfigure",
+      "sudo opscode-reporting-ctl reconfigure",
+      "sudo chef-server-ctl install opscode-manage",
+      "sudo chef-server-ctl reconfigure",
+      "sudo opscode-manage-ctl reconfigure",
+      "sudo chef-server-ctl install opscode-push-jobs-server",
+      "sudo chef-server-ctl reconfigure",
+      "sudo opscode-push-jobs-server reconfigure",
+      "sudo chef-server-ctl reconfigure"
     ]
+  }
+  provisioner "local-exec" {
+    command = "scp -o stricthostkeychecking=no -i ${var.aws_private_key_file} ${var.aws_ami_user}@${aws_instance.chef-server.public_ip}:/tmp/${var.chef_username}.pem /tmp/${var.chef_username}.pem"
+  }
+  provisioner "local-exec" {
+    command = "scp -o stricthostkeychecking=no -i ${var.aws_private_key_file} ${var.aws_ami_user}@${aws_instance.chef-server.public_ip}:/tmp/${var.chef_org}-validator.pem /tmp/${var.chef_org}-validator.pem"
   }
 }
 
