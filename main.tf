@@ -74,24 +74,39 @@ resource "aws_instance" "chef-server" {
     user = "${var.aws_ami_user}"
     private_key = "${var.aws_private_key_file}"
   }
-  # TODO: Remove this; replace with @afiune code
-  provisioner "file" {
-    source = "cookbooks"
-    destination = "/tmp"
-  }
   provisioner "remote-exec" {
     inline = [
       "sudo iptables -A INPUT -p tcp -m multiport --dports 80,443,9683 -j ACCEPT",
       "sudo iptables -A INPUT -p tcp --dport 10000:10003 -j ACCEPT",
       "sudo service iptables save",
       "sudo service iptables restart",
-      "[[ -x /usr/sbin/apt-get ]] && apt-get install -y git || yum install -y git",
-      "curl -sLO https://www.chef.io/chef/install.sh > /dev/null",
-      "sudo bash ./install.sh -P chefdk -n",
-      "sudo rm install.sh",
-      "cd /tmp",
+      "[[ -x /usr/sbin/apt-get ]] && sudo apt-get install -y git || sudo yum install -y git",
+      "curl -s https://packagecloud.io/install/repositories/chef/stable/script.deb.sh -o script.deb.sh",
+      "curl -s https://packagecloud.io/install/repositories/chef/stable/script.rpm.sh -o script.rpm.sh",
+      "[[ -x /usr/sbin/apt-get ]] && sudo bash script.deb.sh || sudo bash script.rpm.sh",
+      "[[ -x /usr/sbin/apt-get ]] && sudo apt-get install -y chef-server-core || sudo yum install -y chef-server-core",
+      "rm -f script.*.sh",
+      "sudo chef-server-ctl reconfigure",
+      "sudo chef-server-ctl user-create ${var.chef_username} ${var.chef_user_firstname} ${var.chef_user_lastname} ${var.chef_user_email} ${base64encode(var.aws_instance.chef-server.id)} -f /tmp/${var.chef_username}.pem",
+      "sudo chef-server-ctl org-create ${var.chef_org} '${var.chef_org_long}' --association_user ${var.chef_username} --filename /tmp/${var.chef_org}-validator.pem",
+      "sudo chef-server-ctl install opscode-reporting",
+      "sudo chef-server-ctl reconfigure",
+      "sudo opscode-reporting-ctl reconfigure",
+      "sudo chef-server-ctl install opscode-manage",
+      "sudo chef-server-ctl reconfigure",
+      "sudo opscode-manage-ctl reconfigure",
+      "sudo chef-server-ctl install opscode-push-jobs-server",
+      "sudo chef-server-ctl reconfigure",
+      "sudo opscode-push-jobs-server reconfigure",
+      "sudo chef-server-ctl reconfigure",
       "sudo chef exec chef-client -z -o chef-server-12"
     ]
+  }
+  provisioner "local-exec" {
+    command = "scp -i ${var.aws_private_key_file} ${var.aws_ami_user}@${var.aws_instance.chef-server.public_ip}:/tmp/${var.chef_username}.pem /tmp/${var.chef_username}.pem"
+  }
+  provisioner "local-exec" {
+    command = "scp -i ${var.aws_private_key_file} ${var.aws_ami_user}@${var.aws_instance.chef-server.public_ip}:/tmp/${var.chef_org}-validator.pem /tmp/${var.chef_org}-validator.pem"
   }
 }
 
