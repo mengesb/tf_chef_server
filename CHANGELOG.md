@@ -1,3 +1,7 @@
+v0.0.2 2016-02-04
+-------------------
+- Removed cookbooks directory from repo
+
 v0.0.1 2016-02-04
 -------------------
 - Implement version in `CHANGELOG.md`
