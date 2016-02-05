@@ -1,8 +1,13 @@
-v0.0.2 2016-02-04
+v0.1.0 (2016-02-04)
+-------------------
+- Bump version
+- Make CHANGELOG.md prettier
+
+v0.0.2 (2016-02-04)
 -------------------
 - Removed cookbooks directory from repo
 
-v0.0.1 2016-02-04
+v0.0.1 (2016-02-04)
 -------------------
 - Implement version in `CHANGELOG.md`
 - Create `CHANGELOG.md`
@@ -10,16 +15,16 @@ v0.0.1 2016-02-04
 - Updates to `outputs.tf`, added more information
 - Updates to `variables.tf`, adding descriptions
 
-Thu Feb 4 21:18:09 2016 -0800 [33mb9e2aa0]
+33mb9e2aa0 (2016-02-04)
 -------------------
 - Fixed old chef exec command hanging around
 - Fixed IPTables issues; flush then set complete rule set
 
-Thu Feb 4 20:19:39 2016 -0800 [33m14b29b9]
+33m14b29b9 (2016-02-04)
 -------------------
 - Fixing references to aws_instance provider items
 
-Thu Feb 4 20:15:00 2016 -0800 [33m5bc32bc]
+33m5bc32bc (2016-02-04)
 -------------------
 - removed cookbooks directory file sync
 - execute chef server creation directly at server
@@ -29,67 +34,67 @@ Thu Feb 4 20:15:00 2016 -0800 [33m5bc32bc]
 - download user pem
 - download org validator pem
 
-Thu Feb 4 11:00:44 2016 -0800 [33m954a88d]
+33m954a88d (2016-02-04)
 -------------------
 - fix bulleted list
 
-Thu Feb 4 10:59:36 2016 -0800 [33ma4c360c]
+33ma4c360c (2016-02-04)
 -------------------
 - Supported OSes
 - more assumptions
 
-Thu Feb 4 10:52:53 2016 -0800 [33m2879244]
+33m2879244 (2016-02-04)
 -------------------
 - Delete email linking
 
-Thu Feb 4 10:52:08 2016 -0800 [33me856561]
+33me856561 (2016-02-04)
 -------------------
 - Correcting e-mail link for Brian Menges
 
-Thu Feb 4 10:48:01 2016 -0800 [33m8b5553f]
+33m8b5553f (2016-02-04)
 -------------------
 - Correcting linking syntax for users
 
-Thu Feb 4 10:44:43 2016 -0800 [33m1077c11]
+33m1077c11 (2016-02-04)
 -------------------
 - Correcting linking syntax
 
-Thu Feb 4 10:40:56 2016 -0800 [33me261f30]
+33me261f30 (2016-02-04)
 -------------------
 - Updating README.md
 - More explanation about how to use this module
 
-Wed Feb 3 14:22:21 2016 -0800 [33mb66e077]
+33mb66e077 (2016-02-03)
 -------------------
 - moved connection outside of the provisioners per @afiune recommendation
 - Added TODO to get rid of the provisioner file hack
 - creative addition of git package supporting CentOS and Ubuntu
 
-Wed Feb 3 12:09:03 2016 -0800 [33m3015e80]
+33m3015e80 (2016-02-03)
 -------------------
 - SPELLING!
 
-Wed Feb 3 12:06:28 2016 -0800 [33m4a9a5eb]
+33m4a9a5eb (2016-02-03)
 -------------------
 - Fixing org to chef_org
 
-Wed Feb 3 11:40:28 2016 -0800 [33m2440c7c]
+33m2440c7c (2016-02-03)
 -------------------
 - Mixed up region and vpc
 
-Wed Feb 3 11:35:46 2016 -0800 [33m5475d18]
+33m5475d18 (2016-02-03)
 -------------------
 - Removing AMI magic
 - Getting too complex, simplifying things
 
-Tue Feb 2 22:06:18 2016 -0800 [33m3a1a2b0]
+33m3a1a2b0 (2016-02-02)
 -------------------
 - Fixed ami reference, using lookup now
 
-Tue Feb 2 21:45:46 2016 -0800 [33m3f76ee1]
+33m3f76ee1 (2016-02-02)
 -------------------
 - Initial commit
 
-Tue Feb 2 17:44:13 2016 -0800 [33mc5e5f07]
+33mc5e5f07 (2016-02-02)
 -------------------
 - Create repo
