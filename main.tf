@@ -87,7 +87,7 @@ resource "aws_instance" "chef-server" {
       "[[ -x /usr/sbin/apt-get ]] && sudo apt-get install -y chef-server-core || sudo yum install -y chef-server-core",
       "rm -f script.*.sh",
       "sudo chef-server-ctl reconfigure",
-      "sudo chef-server-ctl user-create ${var.chef_username} ${var.chef_user_firstname} ${var.chef_user_lastname} ${var.chef_user_email} ${base64encode(var.aws_instance.chef-server.id)} -f /tmp/${var.chef_username}.pem",
+      "sudo chef-server-ctl user-create ${var.chef_username} ${var.chef_user_firstname} ${var.chef_user_lastname} ${var.chef_user_email} ${base64encode(aws_instance.chef-server.id)} -f /tmp/${var.chef_username}.pem",
       "sudo chef-server-ctl org-create ${var.chef_org} '${var.chef_org_long}' --association_user ${var.chef_username} --filename /tmp/${var.chef_org}-validator.pem",
       "sudo chef-server-ctl install opscode-reporting",
       "sudo chef-server-ctl reconfigure",
@@ -103,10 +103,10 @@ resource "aws_instance" "chef-server" {
     ]
   }
   provisioner "local-exec" {
-    command = "scp -i ${var.aws_private_key_file} ${var.aws_ami_user}@${var.aws_instance.chef-server.public_ip}:/tmp/${var.chef_username}.pem /tmp/${var.chef_username}.pem"
+    command = "scp -i ${var.aws_private_key_file} ${var.aws_ami_user}@${aws_instance.chef-server.public_ip}:/tmp/${var.chef_username}.pem /tmp/${var.chef_username}.pem"
   }
   provisioner "local-exec" {
-    command = "scp -i ${var.aws_private_key_file} ${var.aws_ami_user}@${var.aws_instance.chef-server.public_ip}:/tmp/${var.chef_org}-validator.pem /tmp/${var.chef_org}-validator.pem"
+    command = "scp -i ${var.aws_private_key_file} ${var.aws_ami_user}@${aws_instance.chef-server.public_ip}:/tmp/${var.chef_org}-validator.pem /tmp/${var.chef_org}-validator.pem"
   }
 }
 
