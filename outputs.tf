@@ -18,8 +18,11 @@ output "chef_username_password" {
   value = "${base64encode(aws_instance.chef-server.id)}"
 }
 output "chef_username_pem" {
-  value = "/tmp/${var.chef_username}.pem"
+  value = "${path.cwd}/.chef/${var.chef_username}.pem"
+}
+output "chef_org" {
+  value = "${var.chef_org}"
 }
 output "chef_org_validator" {
-  value = "/tmp/${var.chef_org}-validator.pem"
+  value = "${path.cwd}/.chef/${var.chef_org}-validator.pem"
 }
