@@ -79,10 +79,6 @@ variable "chef_delivery" {
   description = "Deploy CHEF Delivery boolean [true/false]"
   default = "false"
 }
-variable "chef_delivery_count" {
-  description = "Number of CHEF Delivery servers to provision. Use 1 or 0 ONLY!"
-  default = 0
-}
 variable "chef_delivery_name" {
   description = "Basename for AWS Name tag of CHEF Delivery server"
   default = "chef-delivery"
@@ -91,4 +87,11 @@ variable "chef_delivery_enterprise" {
   description = "The name of the first CHEF Delivery enterprise (not to be confused with your CHEF organization)"
   default = "Delivery"
 }
-
+variable "chef_delivery_username" {
+  description = "The default CHEF Delivery username"
+  default = "delivery"
+}
+variable "chef_delivery_email" {
+  description = "The default CHEF Delivery user email"
+  default = "delivery@domain.tld"
+}
