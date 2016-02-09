@@ -61,9 +61,9 @@ provider "aws" {
 resource "null_resource" "chef-prep" {
   provisioner "local-exec" {
     command = <<EOF
-[ ! -d ${path.cwd}/.chef ] && mkdir ${path.cwd}/.chef
-[ ! -d ${path.cwd}/.chef/trusted_certs ] && mkdir -p ${path.cwd}/.chef/trusted_certs
-[ ! -d ${path.cwd}/.chef/local-mode-cache ] && mkdir ${path.cwd}/.chef/local-mode-cache/cache/cookbooks
+rm -rf ${path.cwd}/.chef
+mkdir -p ${path.cwd}/.chef/trusted_certs
+mkdir -p ${path.cwd}/.chef/local-mode-cache/cache/cookbooks
 echo "Local prep complete"
 EOF
   }
@@ -87,10 +87,22 @@ resource "aws_instance" "chef-server" {
     user = "${var.aws_ami_user}"
     private_key = "${var.aws_private_key_file}"
   }
+  # Basic setup
   provisioner "remote-exec" {
     inline = [
       "sudo mkdir -p /tmp/.chef/trusted_certs",
       "sudo chmod 777 /tmp/.chef && sudo chmod 777 /tmp/.chef/trusted_certs",
+      "EC2IPV4=$(curl http://169.254.169.254/latest/meta-data/public-ipv4)",
+      "echo $EC2IPV4",
+      "EC2FQDN=$(curl http://169.254.169.254/latest/meta-data/public-hostname)",
+      "EC2HOST=$(echo $EC2FQDN | sed 's/..*//')",
+      "EC2DOMA=$(echo $EC2FQDN | sed \"s/$EC2HOST.//\")",
+      "sudo sed -i '/localhost/{n;s/^/${self.public_ip} ${self.public_dns}\\n/}' /etc/hosts",
+      "[ -f /etc/sysconfig/network ] && sudo hostname ${self.public_dns} || sudo hostname $EC2HOST",
+      "echo ${self.public_dns}|sed 's/\\..*//' > /tmp/hostname",
+      "sudo chown root:root /tmp/hostname",
+      "[ -f /etc/sysconfig/network ] && sudo sed -i 's/^HOSTNAME.*/HOSTNAME=${self.public_dns}/' /etc/sysconfig/network || sudo cp /tmp/hostname /etc/hostname",
+      "sudo rm /tmp/hostname",
       "sudo iptables -F",
       "sudo iptables -A INPUT -m state --state RELATED,ESTABLISHED -j ACCEPT",
       "sudo iptables -A INPUT -p icmp -j ACCEPT",
@@ -101,7 +113,12 @@ resource "aws_instance" "chef-server" {
       "sudo iptables -A INPUT -j REJECT --reject-with icmp-host-prohibited",
       "sudo iptables -A FORWARD -j REJECT --reject-with icmp-host-prohibited",
       "sudo service iptables save",
-      "sudo service iptables restart",
+      "sudo service iptables restart"
+    ]
+  }
+  # Setup packages
+  provisioner "remote-exec" {
+    inline = [
       "[ -x /usr/sbin/apt-get ] && sudo apt-get install -y git || sudo yum install -y git",
       "curl -s https://packagecloud.io/install/repositories/chef/stable/script.deb.sh -o /tmp/.chef/script.deb.sh",
       "curl -s https://packagecloud.io/install/repositories/chef/stable/script.rpm.sh -o /tmp/.chef/script.rpm.sh",
@@ -122,11 +139,12 @@ resource "aws_instance" "chef-server" {
       "sudo opscode-push-jobs-server-ctl reconfigure",
       "sudo chef-server-ctl reconfigure",
       "sudo cp -r /var/opt/opscode/nginx/ca /tmp/.chef/trusted_certs",
-      "sudo chown -R ${var.aws_ami_user} /tmp/.chef/*",
+      "sudo chown -R ${var.aws_ami_user} /tmp/.chef",
       "sudo mv /tmp/.chef/trusted_certs/ca/*.crt /tmp/.chef/trusted_certs",
       "sudo rm -rf /tmp/.chef/trusted_certs/ca"
     ]
   }
+  # Copy back necessary files
   provisioner "local-exec" {
     command = "scp -r -o stricthostkeychecking=no -i ${var.aws_private_key_file} ${var.aws_ami_user}@${aws_instance.chef-server.public_ip}:/tmp/.chef/* ${path.cwd}/.chef/"
   }
@@ -141,15 +159,51 @@ current_dir = File.dirname(__FILE__)
 log_level                :info
 log_location             STDOUT
 node_name                '${var.chef_username}'
-client_key               '#{current_dir}/${var.chef_username}.pem'
+client_key               "#{current_dir}/${var.chef_username}.pem"
 validation_client_name   '${var.chef_org}-validator'
-validation_key           '#{current_dir}/${var.chef_org}-validator.pem'
-chef_server_url          'https://${aws_instance.chef-server.public_ip}/organizations/${var.chef_org}'
+validation_key           "#{current_dir}/${var.chef_org}-validator.pem"
+chef_server_url          'https://${aws_instance.chef-server.public_dns}/organizations/${var.chef_org}'
 cache_type               'BasicFile'
 cache_options( :path => "#{ENV['HOME']}/.chef/checksums" )
-cookbook_path            ['#{current_dir}/local-mode-cache/cache/cookbooks']
+cookbook_path            ["#{current_dir}/local-mode-cache/cache/cookbooks"]
 EOK
 echo "knife.rb written to ${path.cwd}/.chef/knife.rb"
+EOF
+  }
+}
+
+resource "null_resource" "cookbook_upload" {
+  depends_on = ["aws_instance.chef-server"]
+  provisioner "local-exec" {
+    command = <<EOF
+mkdir -p ${path.cwd}/.chef/cookbooks
+cd ${path.cwd}/.chef/cookbooks
+#cat > Berksfile <<EOC
+#source 'https://supermarket.chef.io'
+#
+#cookbook 'chef-server'
+#cookbook 'chef-ingredient'
+#cookbook 'git'
+#cookbook 'apt'
+#cookbook 'yum'
+#cookbook 'chef-splunk'
+#cookbook 'hostsfile'
+#
+#cookbook 'delivery-cluster',
+#  git: 'https://github.com/chef-cookbooks/delivery-cluster.git'
+#
+#cookbook 'delivery_build',
+#  git: 'https://github.com/chef-cookbooks/delivery_build.git'
+#
+#cookbook 'delivery-base',
+#  git: 'https://github.com/chef-cookbooks/delivery-base.git'
+#EOC
+git clone https://github.com/chef-cookbooks/delivery-cluster.git .
+rm -rf .chef
+berks install
+berks upload --no-ssl-verify
+cd ..
+rm -rf cookbooks
 EOF
   }
 }
@@ -169,13 +223,12 @@ resource "null_resource" "delivery_requirements" {
     ]
   }
   provisioner "local-exec" {
-    command = "scp -o stricthostkeychecking=no -i ${var.aws_private_key_file} ${var.aws_ami_user}@${aws_instance.chef-server.public_ip}:/tmp/.chef/${var.chef_delivery_username}.pem ${path.cwd}/.chef/${var.chef_delivery_username}.pem"
-  }
-  provisioner "local-exec" {
     command = <<EOF
-[ -d ${path.cwd}/.chef ] || echo '${path.cwd}/.chef exists' && mkdir -p ${path.cwd}
-[ -f ${path.cwd}/.chef/encrypted_data_bag_secret ] || echo '${path.cwd}/.chef/encrypted_data_bag_secret exists' && openssl rand -base64 512 | tr -d '
-[ -f ${path.cwd}/.chef/builder_key ] || echo '${path.cwd}/.chef/builder_key exists' && ssh-keygen -t rsa -N '' -b 2048 -f ${path.cwd}/.chef/builder_k
+rm -rf ${path.cwd}/.chef/encrypted_data_bag_secret
+rm -rf ${path.cwd}/.chef/builder_key
+openssl rand -base64 512 | tr -d '\r\n' > ${path.cwd}/.chef/encrypted_data_bag_secret
+ssh-keygen -t rsa -N '' -b 2048 -f ${path.cwd}/.chef/builder_key
+scp -o stricthostkeychecking=no -i ${var.aws_private_key_file} ${var.aws_ami_user}@${aws_instance.chef-server.public_ip}:/tmp/.chef/${var.chef_delivery_username}.pem ${path.cwd}/.chef/${var.chef_delivery_username}.pem
 EOF
   }
 }
