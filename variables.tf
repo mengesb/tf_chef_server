@@ -2,8 +2,6 @@
 variable "boolean_lookup" {
   description = "Conversion of boolean truth"
   default = {
-    "true" = 1
-    "false" = 0
     "0" = 0
     "1" = 1
   }
@@ -77,7 +75,7 @@ variable "chef_user_email" {
 }
 variable "chef_delivery" {
   description = "Deploy CHEF Delivery boolean [true/false]"
-  default = "false"
+  default = false
 }
 variable "chef_delivery_name" {
   description = "Basename for AWS Name tag of CHEF Delivery server"
