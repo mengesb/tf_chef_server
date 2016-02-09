@@ -172,6 +172,7 @@ EOF
   }
 }
 
+# Need to put this in the aws_instance resource - ensure cookbooks uploaded before other potential servers spawned
 resource "null_resource" "cookbook_upload" {
   depends_on = ["aws_instance.chef-server"]
   provisioner "local-exec" {
@@ -220,6 +221,8 @@ resource "null_resource" "delivery_requirements" {
   provisioner "remote-exec" {
     inline = [
       "sudo chef-server-ctl user-create ${var.chef_delivery_username} Delivery User ${var.chef_delivery_email} ${base64encode(aws_instance.chef-server.id)} -f /tmp/.chef/${var.chef_delivery_username}.pem",
+      "sudo chef-server-ctl org-user-add ${var.chef_org} ${var.chef_delivery_username}",
+      "echo 'User ${var.chef_delivery_username} associated with ${var.chef_org}'"
     ]
   }
   provisioner "local-exec" {
