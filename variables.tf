@@ -1,3 +1,11 @@
+# Variable mapping lookup logic structure
+variable "boolean_lookup" {
+  description = "Conversion of boolean truth"
+  default = {
+    "0" = 0
+    "1" = 1
+  }
+}
 # AWS provider specific configs
 variable "aws_access_key" {
   description = "Your AWS key (ex. $AWS_ACCESS_KEY_ID)"
@@ -32,14 +40,15 @@ variable "aws_region" {
   description = "AWS Region to deploy to"
   default = "us-west-1"
 }
-variable "aws_instance_name" {
-  default = "chef-server"
-}
-variable "aws_instance_count" {
+# tf_chef_server specific configs
+variable "chef_server_count" {
   description = "Number of CHEF Servers to provision. DO NOT CHANGE!"
   default = 1
 }
-# tf_chef_server specific configs
+variable "chef_server_name" {
+  description = "Basename for AWS Name tag of CHEF Server"
+  default = "chef-server"
+}
 variable "chef_org" {
   description = "Short CHEF Server organization name (lowercase alphanumeric characters only)"
   default = "example"
@@ -63,4 +72,24 @@ variable "chef_user_lastname" {
 variable "chef_user_email" {
   description = "CHEF Server user's e-mail"
   default = "example@domain.tld"
+}
+variable "chef_delivery" {
+  description = "Deploy CHEF Delivery boolean [true/false]"
+  default = false
+}
+variable "chef_delivery_name" {
+  description = "Basename for AWS Name tag of CHEF Delivery server"
+  default = "chef-delivery"
+}
+variable "chef_delivery_enterprise" {
+  description = "The name of the first CHEF Delivery enterprise (not to be confused with your CHEF organization)"
+  default = "Delivery"
+}
+variable "chef_delivery_username" {
+  description = "The default CHEF Delivery username"
+  default = "delivery"
+}
+variable "chef_delivery_email" {
+  description = "The default CHEF Delivery user email"
+  default = "delivery@domain.tld"
 }
