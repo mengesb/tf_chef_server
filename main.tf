@@ -149,11 +149,7 @@ resource "aws_instance" "chef-server" {
   provisioner "local-exec" {
     command = "scp -r -o stricthostkeychecking=no -i ${var.aws_private_key_file} ${var.aws_ami_user}@${self.public_ip}:/tmp/.chef/* ${path.cwd}/.chef/"
   }
-}
-
-# Write knife.rb
-resource "null_resource" "knife_rb" {
-  depends_on = ["aws_instance.chef-server"]
+  # Write knife.rb
   provisioner "local-exec" {
     command = <<EOF
 cat > ${path.cwd}/.chef/knife.rb <<EOK
@@ -172,17 +168,13 @@ EOK
 echo "knife.rb written to ${path.cwd}/.chef/knife.rb"
 EOF
   }
-}
-
-# Need to put this in the aws_instance resource - ensure cookbooks uploaded before other potential servers spawned
-resource "null_resource" "cookbook_upload" {
-  depends_on = ["aws_instance.chef-server","null_resource.knife_rb"]
+  # Upload starting cookbooks
   provisioner "local-exec" {
     command = <<EOF
 mkdir -p ${path.cwd}/.chef/cookbooks
+git clone https://github.com/chef-cookbooks/delivery-cluster.git ${path.cwd}/.chef/cookbooks
+rm -rf ${path.cwd}/.chef/cookbooks/.chef
 cd ${path.cwd}/.chef/cookbooks
-git clone https://github.com/chef-cookbooks/delivery-cluster.git .
-rm -rf .chef
 berks install
 berks upload --no-ssl-verify
 cd ..
