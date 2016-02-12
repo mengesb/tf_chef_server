@@ -1,3 +1,13 @@
+v0.1.1 (2016-02-11)
+-------------------
+- Bump version
+- Move some operations around
+- Place PEM key files under `.chef/keys` now
+- Remove hacks to support Delivery (not necessary anymore)
+- Update variables, trim some characters
+- Update `README.md`
+- Update `CHANGELOG.md` prettier
+
 v0.1.0 (2016-02-04)
 -------------------
 - Bump version
