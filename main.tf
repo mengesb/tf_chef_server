@@ -161,9 +161,9 @@ current_dir = File.dirname(__FILE__)
 log_level                :info
 log_location             STDOUT
 node_name                '${var.username}'
-client_key               "#{current_dir}/${var.username}.pem"
+client_key               "#{current_dir}/keys/${var.username}.pem"
 validation_client_name   '${var.org_short}-validator'
-validation_key           "#{current_dir}/${var.org_short}-validator.pem"
+validation_key           "#{current_dir}/keys/${var.org_short}-validator.pem"
 chef_server_url          'https://${aws_instance.chef-server.public_dns}/organizations/${var.org_short}'
 cache_type               'BasicFile'
 cache_options( :path => "#{ENV['HOME']}/.chef/checksums" )
