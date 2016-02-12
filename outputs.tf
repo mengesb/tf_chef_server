@@ -12,20 +12,20 @@ output "security_group_id" {
   value = "${aws_security_group.chef-server.id}"
 }
 output "chef_server_url" {
-  value = "https://${aws_instance.chef-server.public_dns}/organizations/${var.chef_org}"
+  value = "https://${aws_instance.chef-server.public_dns}/organizations/${var.org_short}"
 }
-output "chef_username" {
-  value = "${var.chef_username}"
+output "username" {
+  value = "${var.username}"
 }
-output "chef_username_password" {
+output "password" {
   value = "${base64encode(aws_instance.chef-server.id)}"
 }
-output "chef_username_pem" {
-  value = "${path.cwd}/.chef/${var.chef_username}.pem"
+output "username_pem" {
+  value = "${path.cwd}/.chef/keys/${var.username}.pem"
 }
-output "chef_org" {
-  value = "${var.chef_org}"
+output "organization" {
+  value = "${var.org_short}"
 }
-output "chef_org_validator" {
-  value = "${path.cwd}/.chef/${var.chef_org}-validator.pem"
+output "org_validator" {
+  value = "${path.cwd}/.chef/keys/${var.org_short}-validator.pem"
 }
