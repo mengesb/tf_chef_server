@@ -71,7 +71,6 @@ resource "null_resource" "chef-prep" {
   provisioner "local-exec" {
     command = <<EOF
 rm -rf ${path.cwd}/.chef
-mkdir -p ${path.cwd}/.chef/keys
 mkdir -p ${path.cwd}/.chef/trusted_certs
 mkdir -p ${path.cwd}/.chef/local-mode-cache/cache/cookbooks
 echo "Local prep complete"
@@ -100,7 +99,6 @@ resource "aws_instance" "chef-server" {
   # Basic setup
   provisioner "remote-exec" {
     inline = [
-      "mkdir -p /tmp/.chef/keys",
       "mkdir -p /tmp/.chef/trusted_certs",
       "chmod 777 -R /tmp/.chef",
       "EC2IPV4=$(curl http://169.254.169.254/latest/meta-data/public-ipv4)",
@@ -136,8 +134,8 @@ resource "aws_instance" "chef-server" {
       "[ -x /usr/sbin/apt-get ] && sudo apt-get install -y chef-server-core || sudo yum install -y chef-server-core",
       "rm -f /tmp/.chef/script.*.sh",
       "sudo chef-server-ctl reconfigure",
-      "sudo chef-server-ctl user-create ${var.username} ${var.user_firstname} ${var.user_lastname} ${var.user_email} ${base64encode(self.id)} -f /tmp/.chef/keys/${var.username}.pem",
-      "sudo chef-server-ctl org-create ${var.org_short} '${var.org_long}' --association_user ${var.username} --filename /tmp/.chef/keys/${var.org_short}-validator.pem",
+      "sudo chef-server-ctl user-create ${var.username} ${var.user_firstname} ${var.user_lastname} ${var.user_email} ${base64encode(self.id)} -f /tmp/.chef/${var.username}.pem",
+      "sudo chef-server-ctl org-create ${var.org_short} '${var.org_long}' --association_user ${var.username} --filename /tmp/.chef/${var.org_short}-validator.pem",
       "sudo chef-server-ctl install opscode-reporting",
       "sudo chef-server-ctl reconfigure",
       "sudo opscode-reporting-ctl reconfigure",
@@ -166,9 +164,9 @@ current_dir = File.dirname(__FILE__)
 log_level                :info
 log_location             STDOUT
 node_name                '${var.username}'
-client_key               "#{current_dir}/keys/${var.username}.pem"
+client_key               "#{current_dir}/${var.username}.pem"
 validation_client_name   '${var.org_short}-validator'
-validation_key           "#{current_dir}/keys/${var.org_short}-validator.pem"
+validation_key           "#{current_dir}/${var.org_short}-validator.pem"
 chef_server_url          'https://${aws_instance.chef-server.public_dns}/organizations/${var.org_short}'
 cache_type               'BasicFile'
 cache_options( :path => "#{ENV['HOME']}/.chef/checksums" )
