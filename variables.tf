@@ -33,11 +33,11 @@ variable "aws_region" {
   default = "us-west-1"
 }
 # tf_chef_server specific configs
-variable "chef_server_count" {
+variable "count" {
   description = "Number of CHEF Servers to provision. DO NOT CHANGE!"
   default = 1
 }
-variable "chef_server_basename" {
+variable "basename" {
   description = "Basename for AWS Name tag of CHEF Server"
   default = "chef-server"
 }
@@ -64,4 +64,8 @@ variable "user_lastname" {
 variable "user_email" {
   description = "CHEF Server user's e-mail"
   default = "example@domain.tld"
+}
+variable "ssh_cidrs" {
+  description = "List of CIDRs to allow SSH from"
+  default = "0.0.0.0/0"
 }
