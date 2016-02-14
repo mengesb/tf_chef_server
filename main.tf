@@ -43,6 +43,15 @@ resource "aws_security_group_rule" "chef-server_allow_9683_tcp_all" {
   cidr_blocks = ["0.0.0.0/0"]
   security_group_id = "${aws_security_group.chef-server.id}"
 }
+# opscode-push-jobs
+resource "aws_security_group_rule" "chef-server_allow_9683_tcp_all" {
+  type = "ingress"
+  from_port = 10000
+  to_port = 10003
+  protocol = "tcp"
+  cidr_blocks = ["0.0.0.0/0"]
+  security_group_id = "${aws_security_group.chef-server.id}"
+}
 # Egress: ALL
 resource "aws_security_group_rule" "chef-server_allow_all" {
   type = "egress"
