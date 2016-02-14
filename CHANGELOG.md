@@ -1,3 +1,7 @@
+v0.1.3 (2016-02-14)
+-------------------
+- Removed keys/ subdirectory from .chef
+
 v0.1.2 (2016-02-14)
 -------------------
 - Changed chef_server_basename to basename
