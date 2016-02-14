@@ -13,7 +13,7 @@ resource "aws_security_group_rule" "chef-server_allow_22_tcp_all" {
   from_port = 22
   to_port = 22
   protocol = "tcp"
-  cidr_blocks = ["0.0.0.0/0"]
+  cidr_blocks = ["${split(",", var.ssh_cidrs)}"]
   security_group_id = "${aws_security_group.chef-server.id}"
 }
 # HTTP (nginx)
@@ -44,7 +44,7 @@ resource "aws_security_group_rule" "chef-server_allow_9683_tcp_all" {
   security_group_id = "${aws_security_group.chef-server.id}"
 }
 # opscode-push-jobs
-resource "aws_security_group_rule" "chef-server_allow_9683_tcp_all" {
+resource "aws_security_group_rule" "chef-server_allow_10000-10003_tcp_all" {
   type = "ingress"
   from_port = 10000
   to_port = 10003
@@ -81,13 +81,13 @@ EOF
 # Provision CHEF Server
 resource "aws_instance" "chef-server" {
   ami = "${var.aws_ami_id}"
-  count = "${var.chef_server_count}"
+  count = "${var.count}"
   instance_type = "${var.aws_flavor}"
   subnet_id = "${var.aws_subnet_id}"
   vpc_security_group_ids = ["${aws_security_group.chef-server.id}"]
   key_name = "${var.aws_key_name}"
   tags = {
-    Name = "${format("%s-%02d-%s", var.chef_server_basename, count.index + 1, var.org_short)}"
+    Name = "${format("%s-%02d-%s", var.basename, count.index + 1, var.org_short)}"
   }
   root_block_device = {
     delete_on_termination = true

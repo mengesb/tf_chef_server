@@ -41,12 +41,15 @@ These resources will incur charges on your AWS bill. It is your responsibility t
 * `aws_flavor`: The AWS instance type. Default: `c3.xlarge`
 * `aws_instance_name`: The AWS tag for Name. Default: `chef-server` will result in a Name tag of `${var.aws_instance_name}-${var.aws_instance_count}-${var.chef_org}`
 * `aws_instance_count`: The number of AWS instances to deploy. Deafult: `1`, DO NOT CHANGE!
+* `basename`: The CHEF server's basename. Default: `chef-server`
+* `count`: The CHEF Server count. Default: `1`; DO NOT CHANGE!
 * `org_short`: The organization to create on the CHEF Server. Default: `example`
 * `org_long`: The long organization name to create on the CHEF Server. Default: `Example CHEF Organization`
 * `username`: The first user for your chef server. Default: `example`
 * `user_firstname`: The first user's first name. Default: `Example`
 * `user_lastname`: The first user's last name. Default: `User`
 * `user_email`: The first user's e-mail address. Default: `example@domain.tld`
+* `ssh_cidrs`: The comma seperated list of addresses in CIDR format to allow SSH access. Default: `0.0.0.0/0`
 
 ## Outputs
 
