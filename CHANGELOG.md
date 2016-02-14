@@ -1,3 +1,11 @@
+v0.1.2 (2016-02-14)
+-------------------
+- Changed chef_server_basename to basename
+- Changed chef_server_count to count
+- Added variable `ssh_cidrs` to allow SSH access restrictions. Default: `0.0.0.0/0`
+- Added ports 10000-10003 to security groups (push-jobs)
+- Supporting documentation updates
+
 v0.1.1 (2016-02-11)
 -------------------
 - Bump version
