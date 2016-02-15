@@ -73,6 +73,8 @@ resource "null_resource" "chef-prep" {
 rm -rf ${path.cwd}/.chef
 mkdir -p ${path.cwd}/.chef/trusted_certs
 mkdir -p ${path.cwd}/.chef/local-mode-cache/cache/cookbooks
+# Encryption key
+openssl rand -base64 512 | tr -d '\r\n' > ${path.cwd}/.chef/encrypted_data_bag_secret
 echo "Local prep complete"
 EOF
   }
