@@ -3,6 +3,7 @@ v0.1.4 (2016-02-15)
 - Documentation cleanup and consisteny with other tf_chef works
 - Removed chef_server_url output
 - Removed public_ip output
+- Removed org_validator output
 - Renamed username_pem to user_pem
 - Adjusted outputs order to reflect display
 - Created chef_server_creds output text
