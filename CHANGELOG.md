@@ -1,3 +1,7 @@
+v0.1.5 (2016-02-15)
+-------------------
+- Fix outputs - no var.password
+
 v0.1.4 (2016-02-15)
 -------------------
 - Documentation cleanup and consisteny with other tf_chef works
