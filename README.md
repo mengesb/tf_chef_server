@@ -1,4 +1,4 @@
-# tf_aws_chef_server
+# tf_chef_server
 Terraform module to setup a CHEF Server in standalone mode. Nothing spectacular here and a very simple implementation. Once this is up and running, recommend you use CHEF to configure your CHEF Server to suit your needs.
 
 ## Assumptions
