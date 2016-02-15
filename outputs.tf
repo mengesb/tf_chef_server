@@ -1,6 +1,6 @@
 # Outputs
 output "chef_server_creds" {
-  value = "\nCreated organization: ${var.org_short}\nusername: ${var.username}\npassword: ${var.password}\nWeb login: https://${aws_instance.chef-server.public_dns}/organizations/${var.org_short}"
+  value = "\nCreated organization: ${var.org_short}\nusername: ${var.username}\npassword: ${base64encode(aws_instance.chef-server.id)}\nWeb login: https://${aws_instance.chef-server.public_dns}/organizations/${var.org_short}"
 }
 output "organization" {
   value = "${var.org_short}"
