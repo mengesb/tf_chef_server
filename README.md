@@ -46,19 +46,18 @@ These resources will incur charges on your AWS bill. It is your responsibility t
 
 * `basename`: CHEF server's basename. Default: `chef-server`
 * `count`: CHEF Server count. Default: `1`; DO NOT CHANGE!
-* `org_short`: The organization to create on the CHEF Server. Default: `terraform`
-* `org_long`: The long organization name to create on the CHEF Server. Default: `Terraform CHEF Organization`
-* `username`: The first user for your chef server. Default: `admin`
-* `user_firstname`: The first user's first name. Default: `Admin`
-* `user_lastname`: The first user's last name. Default: `User`
-* `user_email`: The first user's e-mail address. Default: `admin@domain.tld`
+* `org_short`: CHEF organization to create. Default: `terraform`
+* `org_long`: CHEF organization long name. Default: `Terraform CHEF Organization`
+* `username`: First CHEF Server user. Default: `admin`
+* `user_firstname`: CHEF Server user's first name. Default: `Admin`
+* `user_lastname`: CHEF Server user's last name. Default: `User`
+* `user_email`: CHEF Server user's e-mail address. Default: `admin@domain.tld`
 * `ssh_cidrs`: The comma seperated list of addresses in CIDR format to allow SSH access. Default: `0.0.0.0/0`
 
 ## Outputs
 
 * `chef_server_creds`: Formatted text output with details about the CHEF Server
 * `organization`: The short form name of the organization created on the CHEF Server
-* `org_validator`: The file for the CHEF Server's validation PEM
 * `public_dns`: The public DNS of the instance created
 * `security_group_id`: The AWS security group id for this instance
 * `username`: The first user's CHEF Server username
