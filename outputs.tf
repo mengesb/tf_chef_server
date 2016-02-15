@@ -24,8 +24,11 @@ output "password" {
   value = "${base64encode(aws_instance.chef-server.id)}"
 }
 output "username_pem" {
-  value = "${path.cwd}/.chef/keys/${var.username}.pem"
+  value = "${path.cwd}/.chef/${var.username}.pem"
 }
 output "org_validator" {
-  value = "${path.cwd}/.chef/keys/${var.org_short}-validator.pem"
+  value = "${path.cwd}/.chef/${var.org_short}-validator.pem"
+}
+output "secret_key_file" {
+  value = "${path.cwd}/.chef/encrypted_data_bag_secret"
 }
