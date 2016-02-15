@@ -1,4 +1,6 @@
+#
 # AWS provider specific configs
+#
 variable "aws_access_key" {
   description = "Your AWS key (ex. $AWS_ACCESS_KEY_ID)"
 }
@@ -32,30 +34,32 @@ variable "aws_region" {
   description = "AWS Region to deploy to"
   default = "us-west-1"
 }
+#
 # tf_chef_server specific configs
-variable "count" {
-  description = "Number of CHEF Servers to provision. DO NOT CHANGE!"
-  default = 1
-}
+#
 variable "basename" {
   description = "Basename for AWS Name tag of CHEF Server"
   default = "chef-server"
 }
+variable "count" {
+  description = "Number of CHEF Servers to provision. DO NOT CHANGE!"
+  default = 1
+}
 variable "org_short" {
   description = "Short CHEF Server organization name (lowercase alphanumeric characters only)"
-  default = "example"
+  default = "terraform"
 }
 variable "org_long" {
   description = "Long form name of your first CHEF Server organization"
-  default = "Example CHEF Organization"
+  default = "Terraform CHEF Organization"
 }
 variable "username" {
   description = "Username of the first CHEF Server user"
-  default = "example"
+  default = "admin"
 }
 variable "user_firstname" {
   description = "CHEF Server user's first name"
-  default = "Example"
+  default = "Admin"
 }
 variable "user_lastname" {
   description = "CHEF Server user's last name"
@@ -63,7 +67,7 @@ variable "user_lastname" {
 }
 variable "user_email" {
   description = "CHEF Server user's e-mail"
-  default = "example@domain.tld"
+  default = "admin@domain.tld"
 }
 variable "ssh_cidrs" {
   description = "List of CIDRs to allow SSH from"
