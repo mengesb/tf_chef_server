@@ -29,6 +29,8 @@ These resources will incur charges on your AWS bill. It is your responsibility t
 
 ## Input variables
 
+### AWS variables
+
 * `aws_access_key`: Your AWS key, usually referred to as `AWS_ACCESS_KEY_ID`
 * `aws_secret_key`: Your secret for your AWS key, usually referred to as `AWS_SECRET_ACCESS_KEY`
 * `aws_region`: AWS region you want to deploy to. Default: `us-west-1`
@@ -39,30 +41,29 @@ These resources will incur charges on your AWS bill. It is your responsibility t
 * `aws_ami_user`: The user for the AMI you're using. Example: `centos`
 * `aws_ami_id`: The AWS id of the AMI. Default: `ami-45844401` [CentOS 6 (x86_64) - with Updates HVM (us-west-1)](https://aws.amazon.com/marketplace/pp/B00NQAYLWO)
 * `aws_flavor`: The AWS instance type. Default: `c3.xlarge`
-* `aws_instance_name`: The AWS tag for Name. Default: `chef-server` will result in a Name tag of `${var.aws_instance_name}-${var.aws_instance_count}-${var.chef_org}`
-* `aws_instance_count`: The number of AWS instances to deploy. Deafult: `1`, DO NOT CHANGE!
-* `basename`: The CHEF server's basename. Default: `chef-server`
-* `count`: The CHEF Server count. Default: `1`; DO NOT CHANGE!
-* `org_short`: The organization to create on the CHEF Server. Default: `example`
-* `org_long`: The long organization name to create on the CHEF Server. Default: `Example CHEF Organization`
-* `username`: The first user for your chef server. Default: `example`
-* `user_firstname`: The first user's first name. Default: `Example`
+
+### tf_chef_server variables
+
+* `basename`: CHEF server's basename. Default: `chef-server`
+* `count`: CHEF Server count. Default: `1`; DO NOT CHANGE!
+* `org_short`: The organization to create on the CHEF Server. Default: `terraform`
+* `org_long`: The long organization name to create on the CHEF Server. Default: `Terraform CHEF Organization`
+* `username`: The first user for your chef server. Default: `admin`
+* `user_firstname`: The first user's first name. Default: `Admin`
 * `user_lastname`: The first user's last name. Default: `User`
-* `user_email`: The first user's e-mail address. Default: `example@domain.tld`
+* `user_email`: The first user's e-mail address. Default: `admin@domain.tld`
 * `ssh_cidrs`: The comma seperated list of addresses in CIDR format to allow SSH access. Default: `0.0.0.0/0`
 
 ## Outputs
 
-* `id`: The AWS instance id of the instance created
-* `public_ip`: The public IP of the instance created
-* `public_dns`: The public DNS of the instance created
-* `security_group_id`: The AWS security group id for this instance
-* `chef_server_url`: The URL of the CHEF Server created
-* `username`: The first user's CHEF Server username
-* `password`: The password for your first chef user
-* `username_pem`: The pem key for the first user on your CHEF Server
+* `chef_server_creds`: Formatted text output with details about the CHEF Server
 * `organization`: The short form name of the organization created on the CHEF Server
 * `org_validator`: The file for the CHEF Server's validation PEM
+* `public_dns`: The public DNS of the instance created
+* `security_group_id`: The AWS security group id for this instance
+* `username`: The first user's CHEF Server username
+* `user_password`: The password for your first chef user
+* `user_pem`: The pem key for the first user on your CHEF Server
 
 ## Contributors
 
