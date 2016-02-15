@@ -70,10 +70,11 @@ provider "aws" {
 resource "null_resource" "chef-prep" {
   provisioner "local-exec" {
     command = <<EOF
+# Cleanup paths
 rm -rf ${path.cwd}/.chef
 mkdir -p ${path.cwd}/.chef/trusted_certs
 mkdir -p ${path.cwd}/.chef/local-mode-cache/cache/cookbooks
-# Encryption key
+# Generate Encryption key
 openssl rand -base64 512 | tr -d '\r\n' > ${path.cwd}/.chef/encrypted_data_bag_secret
 echo "Local prep complete"
 EOF
@@ -98,7 +99,7 @@ resource "aws_instance" "chef-server" {
     user = "${var.aws_ami_user}"
     private_key = "${var.aws_private_key_file}"
   }
-  # Basic setup
+  # Hostname setup
   provisioner "remote-exec" {
     inline = [
       "mkdir -p /tmp/.chef/trusted_certs",
@@ -112,7 +113,12 @@ resource "aws_instance" "chef-server" {
       "echo ${self.public_dns}|sed 's/\\..*//' > /tmp/hostname",
       "sudo chown root:root /tmp/hostname",
       "[ -f /etc/sysconfig/network ] && sudo sed -i 's/^HOSTNAME.*/HOSTNAME=${self.public_dns}/' /etc/sysconfig/network || sudo cp /tmp/hostname /etc/hostname",
-      "sudo rm /tmp/hostname",
+      "sudo rm /tmp/hostname"
+    ]
+  }
+  # Handle iptables
+  provisioner "remote-exec" {
+    inline = [
       "sudo iptables -F",
       "sudo iptables -A INPUT -m state --state RELATED,ESTABLISHED -j ACCEPT",
       "sudo iptables -A INPUT -p icmp -j ACCEPT",
@@ -126,7 +132,7 @@ resource "aws_instance" "chef-server" {
       "sudo service iptables restart"
     ]
   }
-  # Setup packages
+  # Install chef-server-core via packagecloud.io
   provisioner "remote-exec" {
     inline = [
       "[ -x /usr/sbin/apt-get ] && sudo apt-get install -y git || sudo yum install -y git",
@@ -134,7 +140,12 @@ resource "aws_instance" "chef-server" {
       "curl -s https://packagecloud.io/install/repositories/chef/stable/script.rpm.sh -o /tmp/.chef/script.rpm.sh",
       "[ -x /usr/sbin/apt-get ] && sudo bash /tmp/.chef/script.deb.sh || sudo bash /tmp/.chef/script.rpm.sh",
       "[ -x /usr/sbin/apt-get ] && sudo apt-get install -y chef-server-core || sudo yum install -y chef-server-core",
-      "rm -f /tmp/.chef/script.*.sh",
+      "rm -f /tmp/.chef/script.*.sh"
+    ]
+  }
+  # Configure chef-server-core
+  provisioner "remote-exec" {
+    inline = [
       "sudo chef-server-ctl reconfigure",
       "sudo chef-server-ctl user-create ${var.username} ${var.user_firstname} ${var.user_lastname} ${var.user_email} ${base64encode(self.id)} -f /tmp/.chef/${var.username}.pem",
       "sudo chef-server-ctl org-create ${var.org_short} '${var.org_long}' --association_user ${var.username} --filename /tmp/.chef/${var.org_short}-validator.pem",
@@ -147,18 +158,23 @@ resource "aws_instance" "chef-server" {
       "sudo chef-server-ctl install opscode-push-jobs-server",
       "sudo chef-server-ctl reconfigure",
       "sudo opscode-push-jobs-server-ctl reconfigure",
-      "sudo chef-server-ctl reconfigure",
+      "sudo chef-server-ctl reconfigure"
+    ]
+  }
+  # Harvest self-signed certificates
+  provisioner "remote-exec" {
+    inline = [
       "sudo cp -r /var/opt/opscode/nginx/ca /tmp/.chef/trusted_certs",
       "sudo chown -R ${var.aws_ami_user} /tmp/.chef",
       "sudo mv /tmp/.chef/trusted_certs/ca/*.crt /tmp/.chef/trusted_certs",
       "sudo rm -rf /tmp/.chef/trusted_certs/ca"
     ]
   }
-  # Copy back necessary files
+  # Copy back self-signed certificates
   provisioner "local-exec" {
     command = "scp -r -o stricthostkeychecking=no -i ${var.aws_private_key_file} ${var.aws_ami_user}@${self.public_ip}:/tmp/.chef/* ${path.cwd}/.chef/"
   }
-  # Write knife.rb
+  # Generate knife.rb
   provisioner "local-exec" {
     command = <<EOF
 cat > ${path.cwd}/.chef/knife.rb <<EOK
@@ -177,7 +193,7 @@ EOK
 echo "knife.rb written to ${path.cwd}/.chef/knife.rb"
 EOF
   }
-  # Upload starting cookbooks
+  # Upload initial cookbooks
   provisioner "local-exec" {
     command = <<EOF
 mkdir -p ${path.cwd}/.chef/cookbooks
