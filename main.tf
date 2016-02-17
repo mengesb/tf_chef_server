@@ -135,10 +135,11 @@ resource "aws_instance" "chef-server" {
   # Install chef-server-core via packagecloud.io
   provisioner "remote-exec" {
     inline = [
-      "[ -x /usr/sbin/apt-get ] && sudo apt-get install -y git || sudo yum install -y git",
       "curl -s https://packagecloud.io/install/repositories/chef/stable/script.deb.sh -o /tmp/.chef/script.deb.sh",
       "curl -s https://packagecloud.io/install/repositories/chef/stable/script.rpm.sh -o /tmp/.chef/script.rpm.sh",
       "[ -x /usr/sbin/apt-get ] && sudo bash /tmp/.chef/script.deb.sh || sudo bash /tmp/.chef/script.rpm.sh",
+      "[ -f /etc/yum.repos.d/chef_stable.repo ] && sudo sed -i 's|?dist=.&amp;os=el||g' /etc/yum.repos.d/chef_stable.repo",
+      "[ -x /usr/bin/yum ] && sudo yum install -y pygpgme yum-utils",
       "[ -x /usr/sbin/apt-get ] && sudo apt-get install -y chef-server-core || sudo yum install -y chef-server-core",
       "rm -f /tmp/.chef/script.*.sh"
     ]

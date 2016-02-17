@@ -1,3 +1,7 @@
+v0.1.6 (2016-02-16)
+-------------------
+- Packagecloud.io had some "senior moments". Brute force fix some of its shenanigans.
+
 v0.1.5 (2016-02-15)
 -------------------
 - Fix outputs - no var.password
