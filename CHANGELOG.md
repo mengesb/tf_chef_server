@@ -1,3 +1,14 @@
+v0.2.0 (2016-03-15)
+-------------------
+- Overhauled plan logistics
+- Using chef-server cookbook instead of lots of chef-server-ctl commands
+- workaround implemented to use a generated file within plan (validator-pem module)
+- Dependency on Route53 currently, investigate making this an option again
+- Dependency on valid SSL certificate
+- Documentation updates as necessary
+- Pre-selected AMI maps (based on stated chef server compatibility)
+- Need to re-implement firewall handling better
+
 v0.1.6 (2016-02-16)
 -------------------
 - Packagecloud.io had some "senior moments". Brute force fix some of its shenanigans.

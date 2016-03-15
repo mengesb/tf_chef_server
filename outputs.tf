@@ -1,25 +1,22 @@
 # Outputs
-output "chef_server_creds" {
-  value = "\nCreated organization: ${var.org_short}\nusername: ${var.username}\npassword: ${base64encode(aws_instance.chef-server.id)}\nWeb login: https://${aws_instance.chef-server.public_dns}/organizations/${var.org_short}"
+output "credentials" {
+  value = "${template_file.chef-server-creds.rendered}"
+}
+output "fqdn" {
+  value = "${aws_instance.chef-server.tags.Name}"
+}
+output "private_ip" {
+  value = "${aws_instance.chef-server.private_ip}"
+}
+output "public_ip" {
+  value = "${aws_instance.chef-server.public_ip}"
 }
 output "organization" {
   value = "${var.org_short}"
 }
-output "public_dns" {
-  value = "${aws_instance.chef-server.public_dns}"
-}
 output "security_group_id" {
   value = "${aws_security_group.chef-server.id}"
 }
-output "secret_key_file" {
-  value = "${path.cwd}/.chef/encrypted_data_bag_secret"
-}
-output "username" {
-  value = "${var.username}"
-}
-output "user_password" {
-  value = "${base64encode(aws_instance.chef-server.id)}"
-}
-output "user_pem" {
-  value = "${path.cwd}/.chef/${var.username}.pem"
+output "secret_file" {
+  value = ".chef/encrypted_data_bag_secret"
 }

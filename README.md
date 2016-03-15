@@ -1,10 +1,9 @@
 # tf_chef_server
-Terraform module to setup a CHEF Server in standalone mode. Nothing spectacular here and a very simple implementation. Once this is up and running, recommend you use CHEF to configure your CHEF Server to suit your needs.
+Terraform module to setup a Chef Server in standalone mode. Nothing spectacular here and a very simple implementation. Once this is up and running, recommend you use Chef to configure your Chef Server to suit your needs.
 
 ## Assumptions
 
 * Uses AWS
-* You will supply the AMI
 * You will supply the subnet
 * You will supply the VPC
 * Uses a public IP and public DNS
@@ -12,7 +11,7 @@ Terraform module to setup a CHEF Server in standalone mode. Nothing spectacular 
   * 22/tcp: SSH
   * 443/tcp: HTTPS
   * 80/tcp: HTTP
-  * 10000-10003: CHEF Push Jobs
+  * 10000-10003: Chef Push Jobs
 * Understand Terraform and ability to read the source
 
 ## Supported OSes
@@ -20,8 +19,10 @@ All supported OSes are 64-bit and HVM (though PV should be supported)
 
 * Ubuntu 12.04 LTS
 * Ubuntu 14.04 LTS
+* Ubuntu 16.04 LTS (pending)
 * CentOS 6 (Default)
-* CentOS 7
+* CentOS 7 (pending)
+* Others (here be dragons! Please see Map Variables)
 
 ## AWS
 
@@ -38,31 +39,75 @@ These resources will incur charges on your AWS bill. It is your responsibility t
 * `aws_private_key_file`: The full path to the private kye matching `aws_key_name` public key on AWS
 * `aws_vpc_id`: The AWS id of the VPC to use. Example: `vpc-ffffffff`
 * `aws_subnet_id`: The AWS id of the subnet to use. Example: `subnet-ffffffff`
-* `aws_ami_user`: The user for the AMI you're using. Example: `centos`
-* `aws_ami_id`: The AWS id of the AMI. Default: `ami-45844401` [CentOS 6 (x86_64) - with Updates HVM (us-west-1)](https://aws.amazon.com/marketplace/pp/B00NQAYLWO)
 * `aws_flavor`: The AWS instance type. Default: `c3.xlarge`
 
 ### tf_chef_server variables
 
-* `basename`: CHEF server's basename. Default: `chef-server`
-* `count`: CHEF Server count. Default: `1`; DO NOT CHANGE!
-* `org_short`: CHEF organization to create. Default: `terraform`
-* `org_long`: CHEF organization long name. Default: `Terraform CHEF Organization`
-* `username`: First CHEF Server user. Default: `admin`
-* `user_firstname`: CHEF Server user's first name. Default: `Admin`
-* `user_lastname`: CHEF Server user's last name. Default: `User`
-* `user_email`: CHEF Server user's e-mail address. Default: `admin@domain.tld`
-* `ssh_cidrs`: The comma seperated list of addresses in CIDR format to allow SSH access. Default: `0.0.0.0/0`
+* `tag_description`: Text field tag 'Description'
+* `hostname`: Chef server's basename. Default: `chef-server`
+* `domain`: Chef server's basename. Default: `chef-server`
+* `server_count`: Chef Server count. Default: `1`; DO NOT CHANGE!
+* `org_short`: Chef organization to create. Default: `terraform`
+* `org_long`: Chef organization long name. Default: `Terraform Chef Organization`
+* `username`: First Chef Server user. Default: `admin`
+* `user_firstname`: Chef Server user's first name. Default: `Admin`
+* `user_lastname`: Chef Server user's last name. Default: `User`
+* `user_email`: Chef Server user's e-mail address. Default: `admin@domain.tld`
+* `allowed_cidrs`: The comma seperated list of addresses in CIDR format to allow SSH access. Default: `0.0.0.0/0`
+* `ssl_cert`: Chef Server SSL certificate in PEM format
+* `ssl_key`: Chef Server SSL certificate key
+* `r53_zone_id`: AWS Route53 Zone ID to add an A record for the Chef Server
+
+### Map variables
+
+The below mapping variables construct selection criteria
+
+* `ami_map`: AMI selection map comprised of `ami_os` and `aws_region`
+* `ami_usermap`: Default username selection map based off `ami_os`
+
+The `ami_map` is a combination of `ami_os` and `aws_region` which declares the AMI selected. To override this pre-declared AMI, define
+
+```
+ami_map.<ami_os>-<aws_region> = "value"
+```
+
+Variable `ami_os` should be one of the following:
+
+* centos6
+* centos7
+* ubuntu12
+* ubuntu14
+* ubuntu16
+
+Variable `aws_region` should be one of the following:
+
+* us-east-1
+* us-west-2
+* us-west-1 (default)
+* eu-central-1
+* eu-west-1
+* ap-southeast-1
+* ap-southeast-2
+* ap-northeast-1
+* ap-northeast-2
+* sa-east-1
+* Custom (must be an AWS region, requires setting `ami_map` and setting AMI value)
+
+Map `ami_usermap` uses `ami_os` to look the default username for interracting with the instance. To override this pre-declared user, define
+
+```
+ami_usermap.<ami_os> = "value"
+```
 
 ## Outputs
 
-* `chef_server_creds`: Formatted text output with details about the CHEF Server
-* `organization`: The short form name of the organization created on the CHEF Server
-* `public_dns`: The public DNS of the instance created
+* `credentials`: Formatted text output with details about the Chef Server
+* `fqdn`: The fully qualified domain name of the Chef Server
+* `organization`: The short form name of the organization created on the Chef Server
+* `public_ip`: The public IP address of the instance
+* `private_ip`: The private IP address of the instance
 * `security_group_id`: The AWS security group id for this instance
-* `username`: The first user's CHEF Server username
-* `user_password`: The password for your first chef user
-* `user_pem`: The pem key for the first user on your CHEF Server
+* `secret_file`: The encrypted data bag secret file
 
 ## Contributors
 
@@ -79,4 +124,5 @@ Please refer to the [`CHANGELOG.md`](CHANGELOG.md)
 
 ## License
 
-This is licensed undert [the Apache 2.0 license](https://www.apache.org/licenses/LICENSE-2.0).
+This is licensed under [the Apache 2.0 license](https://www.apache.org/licenses/LICENSE-2.0).
+
