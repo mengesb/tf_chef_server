@@ -23,13 +23,6 @@ variable "aws_vpc_id" {
 variable "aws_subnet_id" {
   description = "AWS Subnet id (ex. subnet-ffffffff)"
 }
-#variable "aws_ami_user" {
-#  description = "AWS AMI default username"
-#}
-#variable "aws_ami_id" {
-#  description = "AWS Instance ID (region dependent)"
-#  default     = "ami-45844401"
-#}
 variable "aws_flavor" {
   description = "AWS Instance type to deploy"
   default     = "c3.xlarge"
@@ -44,16 +37,16 @@ variable "ami_os" {
 variable "ami_map" {
   description = "AMI map of OS/region (2016-03-14)"
   default     = {
-#    centos7-us-east-1       = "ami-6d1c2007"
-#    centos7-us-west-2       = "ami-d2c924b2"
-#    centos7-us-west-1       = "ami-af4333cf"
-#    centos7-eu-central-1    = "ami-9bf712f4"
-#    centos7-eu-west-1       = "ami-7abd0209"
-#    centos7-ap-southeast-1  = "ami-f068a193"
-#    centos7-ap-southeast-2  = "ami-fedafc9d"
-#    centos7-ap-northeast-1  = "ami-eec1c380"
-#    centos7-ap-northeast-2  = "ami-c74789a9"
-#    centos7-sa-east-1       = "ami-26b93b4a"
+    centos7-us-east-1       = "ami-6d1c2007"
+    centos7-us-west-2       = "ami-d2c924b2"
+    centos7-us-west-1       = "ami-af4333cf"
+    centos7-eu-central-1    = "ami-9bf712f4"
+    centos7-eu-west-1       = "ami-7abd0209"
+    centos7-ap-southeast-1  = "ami-f068a193"
+    centos7-ap-southeast-2  = "ami-fedafc9d"
+    centos7-ap-northeast-1  = "ami-eec1c380"
+    centos7-ap-northeast-2  = "ami-c74789a9"
+    centos7-sa-east-1       = "ami-26b93b4a"
     centos6-us-east-1       = "ami-1c221e76"
     centos6-us-west-2       = "ami-05cf2265"
     centos6-us-west-1       = "ami-ac5f2fcc"
@@ -84,16 +77,16 @@ variable "ami_map" {
     ubuntu14-ap-northeast-1 = "ami-88686be6"
     ubuntu14-ap-northeast-2 = "-1"
     ubuntu14-sa-east-1      = "ami-f3e4669f"
-    ubuntu12-us-east-1      = "-1"
-    ubuntu12-us-west-2      = "-1"
-    ubuntu12-us-west-1      = "-1"
-    ubuntu12-eu-central-1   = "-1"
-    ubuntu12-eu-west-1      = "-1"
-    ubuntu12-ap-southeast-1 = "-1"
-    ubuntu12-ap-southeast-2 = "-1"
-    ubuntu12-ap-northeast-1 = "-1"
+    ubuntu12-us-east-1      = "ami-88dfdee2"
+    ubuntu12-us-west-2      = "ami-1a977e7a"
+    ubuntu12-us-west-1      = "ami-4f285a2f"
+    ubuntu12-eu-central-1   = "ami-3cf61153"
+    ubuntu12-eu-west-1      = "ami-65932916"
+    ubuntu12-ap-southeast-1 = "ami-26e32845"
+    ubuntu12-ap-southeast-2 = "ami-d54e6eb6"
+    ubuntu12-ap-northeast-1 = "ami-f2afa79c"
     ubuntu12-ap-northeast-2 = "-1"
-    ubuntu12-sa-east-1      = "-1"
+    ubuntu12-sa-east-1      = "ami-2661ec4a"
   }
 }
 variable "ami_usermap" {
@@ -103,6 +96,7 @@ variable "ami_usermap" {
     centos6  = "centos"
     ubuntu16 = "ubuntu"
     ubuntu14 = "ubuntu"
+    ubuntu12 = "ubuntu"
   }
 }
 #
@@ -151,6 +145,14 @@ variable "user_email" {
 variable "allowed_cidrs" {
   description = "List of CIDRs to allow SSH from (CSV list allowed)"
   default     = "0.0.0.0/0"
+}
+variable "r53" {
+  description = "Use Route53"
+  default     = 0
+}
+variable "r53_ttl" {
+  description = "Route53 A record TTL (Default: 180)"
+  default     = 180
 }
 variable "r53_zone_id" {
   description = "Route53 Zone ID"

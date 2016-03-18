@@ -1,3 +1,12 @@
+v0.2.1 (2015=03-18)
+-------------------
+- Replaced `aws_ami_id` with `ami_map`
+- Replaced `ami_user_id` with `ami_usermap`
+- Using lookups in `variables.tf` for AMI (`ami_map` lookup based on `ami_os` and `aws_region`)
+- Using lookups in `variables.tf` for default AMI user id (`ami_usermap` lookup based on `ami_os`)
+- Re-added virtual boolean control over Route53 using `r53` variable (0/1)
+- Added Route53 TTL variable `r53_ttl`
+
 v0.2.0 (2016-03-15)
 -------------------
 - Overhauled plan logistics
