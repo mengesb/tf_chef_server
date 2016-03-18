@@ -96,8 +96,7 @@ resource "template_file" "knife-rb" {
     org  = "${var.org_short}"
   }
 }
-# TODO: Investigate if 'trigger' can be used with multiple Chef Server instances to handle HA
-# Provision Chef Server
+# Provision Chef Server with Chef cookbook chef-server
 resource "aws_instance" "chef-server" {
   ami = "${lookup(var.ami_map, format("%s-%s", var.ami_os, var.aws_region))}"
   count = "${var.server_count}"
@@ -231,7 +230,6 @@ resource "null_resource" "inception_chef" {
     server_url = "https://${aws_instance.chef-server.tags.Name}/organizations/${var.org_short}"
     #secret_key = "${file("${var.secret_key_file}")}"
     validation_client_name = "${var.org_short}-validator"
-    #validation_key = "${file(".chef/${var.org_short}-validator.pem")}"
     validation_key = "${file("${module.validator-pem.validator_pem}")}"
   }
 }
@@ -240,7 +238,7 @@ resource "aws_route53_record" "chef-server" {
   zone_id = "${var.r53_zone_id}"
   name = "${aws_instance.chef-server.tags.Name}"
   type = "A"
-  ttl = "180"
+  ttl = "${var.r53_ttl}"
   records = ["${aws_instance.chef-server.public_ip}"]
 }
 # Generate pretty output format
@@ -251,7 +249,6 @@ resource "template_file" "chef-server-creds" {
     pass = "${base64sha256(aws_instance.chef-server.id)}"
     fqdn = "${aws_instance.chef-server.tags.Name}"
     org = "${var.org_short}"
-    #pem = ".chef/${var.username}.pem"
     pem = "${module.validator-pem.validator_pem}"
   }
 }

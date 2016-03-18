@@ -3,9 +3,11 @@ Terraform module to setup a Chef Server in standalone mode. Nothing spectacular 
 
 ## Assumptions
 
-* Uses AWS
-* You will supply the subnet
-* You will supply the VPC
+* Requires:
+  * AWS (duh!)
+  * AWS subnet id
+  * AWS VPC id
+  * SSL certificate/key for created instance
 * Uses a public IP and public DNS
 * Creates default security group as follows:
   * 22/tcp: SSH
@@ -33,30 +35,32 @@ These resources will incur charges on your AWS bill. It is your responsibility t
 ### AWS variables
 
 * `aws_access_key`: Your AWS key, usually referred to as `AWS_ACCESS_KEY_ID`
-* `aws_secret_key`: Your secret for your AWS key, usually referred to as `AWS_SECRET_ACCESS_KEY`
-* `aws_region`: AWS region you want to deploy to. Default: `us-west-1`
+* `aws_flavor`: The AWS instance type. Default: `c3.xlarge`
 * `aws_key_name`: The private key pair name on AWS to use (String)
 * `aws_private_key_file`: The full path to the private kye matching `aws_key_name` public key on AWS
-* `aws_vpc_id`: The AWS id of the VPC to use. Example: `vpc-ffffffff`
+* `aws_region`: AWS region you want to deploy to. Default: `us-west-1`
+* `aws_secret_key`: Your secret for your AWS key, usually referred to as `AWS_SECRET_ACCESS_KEY`
 * `aws_subnet_id`: The AWS id of the subnet to use. Example: `subnet-ffffffff`
-* `aws_flavor`: The AWS instance type. Default: `c3.xlarge`
+* `aws_vpc_id`: The AWS id of the VPC to use. Example: `vpc-ffffffff`
 
 ### tf_chef_server variables
 
-* `tag_description`: Text field tag 'Description'
-* `hostname`: Chef server's basename. Default: `chef-server`
-* `domain`: Chef server's basename. Default: `chef-server`
-* `server_count`: Chef Server count. Default: `1`; DO NOT CHANGE!
-* `org_short`: Chef organization to create. Default: `terraform`
-* `org_long`: Chef organization long name. Default: `Terraform Chef Organization`
-* `username`: First Chef Server user. Default: `admin`
-* `user_firstname`: Chef Server user's first name. Default: `Admin`
-* `user_lastname`: Chef Server user's last name. Default: `User`
-* `user_email`: Chef Server user's e-mail address. Default: `admin@domain.tld`
 * `allowed_cidrs`: The comma seperated list of addresses in CIDR format to allow SSH access. Default: `0.0.0.0/0`
+* `domain`: Chef server's basename. Default: `localhost`
+* `hostname`: Chef server's basename. Default: `localdomain`
+* `org_short`: Chef organization to create. Default: `chef`
+* `org_long`: Chef organization long name. Default: `Chef Organization`
+* `r53`: Boolean determines if Route53 will be used or not. Default: `0`
+* `r53_ttl`: Time to Live (TTL) setting for Route53 A record to be created. Default: `180`
+* `r53_zone_id`: AWS Route53 Zone ID to add an A record for the Chef Server
+* `server_count`: Chef Server count. Default: `1`; DO NOT CHANGE!
 * `ssl_cert`: Chef Server SSL certificate in PEM format
 * `ssl_key`: Chef Server SSL certificate key
-* `r53_zone_id`: AWS Route53 Zone ID to add an A record for the Chef Server
+* `tag_description`: Text field tag 'Description'
+* `username`: First Chef Server user. Default: `admin`
+* `user_email`: Chef Server user's e-mail address. Default: `admin@domain.tld`
+* `user_firstname`: Chef Server user's first name. Default: `Admin`
+* `user_lastname`: Chef Server user's last name. Default: `User`
 
 ### Map variables
 
@@ -73,7 +77,7 @@ ami_map.<ami_os>-<aws_region> = "value"
 
 Variable `ami_os` should be one of the following:
 
-* centos6
+* centos6 (default)
 * centos7
 * ubuntu12
 * ubuntu14
