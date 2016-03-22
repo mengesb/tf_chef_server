@@ -1,4 +1,4 @@
-v0.2.1 (2016-03-21)
+v0.2.2 (2016-03-21)
 -------------------
 - Added org validator to output
 - Handle IPTables and UFW
