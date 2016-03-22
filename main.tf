@@ -122,7 +122,10 @@ resource "aws_instance" "chef-server" {
       "mkdir -p .chef",
       "sudo mkdir -p /var/chef/cache /var/chef/cookbooks /var/chef/ssl",
       "sudo service iptables stop",
-      "echo 'say WHAT one more time'"
+      "sudo chkconfig iptables off",
+      "sudo ufw disable",
+      "curl -sL https://www.chef.io/chef/install.sh | sudo bash",
+      "echo 'Say WHAT one more time'"
     ]
   }
   # Copy to server script to download necessary cookbooks
@@ -204,7 +207,8 @@ EOC
   # Push in cookbooks
   provisioner "remote-exec" {
     inline = [
-      "sudo knife cookbook upload -a -c ~/.chef/knife.rb --cookbook-path /var/chef/cookbooks",
+      "sudo knife cookbook upload -a -c .chef/knife.rb --cookbook-path /var/chef/cookbooks",
+      "sudo rm -rf /var/chef/cookbooks",
     ]
   }
 }
