@@ -14,6 +14,9 @@ output "public_ip" {
 output "organization" {
   value = "${var.org_short}"
 }
+output "organization_validator" {
+  value = "${module.validator-pem.validator_pem}"
+}
 output "security_group_id" {
   value = "${aws_security_group.chef-server.id}"
 }

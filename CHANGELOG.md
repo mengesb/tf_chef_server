@@ -1,4 +1,9 @@
-v0.2.1 (2015=03-18)
+v0.2.1 (2016-03-21)
+-------------------
+- Added org validator to output
+- Handle IPTables and UFW
+
+v0.2.1 (2016-03-18)
 -------------------
 - Replaced `aws_ami_id` with `ami_map`
 - Replaced `ami_user_id` with `ami_usermap`
