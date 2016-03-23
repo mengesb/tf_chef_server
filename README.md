@@ -118,6 +118,10 @@ ami_usermap.<ami_os> = "value"
 * [Brian Menges](https://github.com/mengesb)
 * [Salim Afiune](https://github.com/afiune)
 
+## Runtime sample
+
+You can view a runtime output sample here: [tf_chef_server-runtime.txt](https://gist.github.com/mengesb/dbc393ee9aeaf2c0a9a7)
+
 ## Contributing
 
 Please understand that this is a work in progress and is subject to change rapidly. Please be sure to keep up to date with the repo should you fork, and feel free to contact me regarding development and suggested direction
