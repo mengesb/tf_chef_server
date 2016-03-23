@@ -1,3 +1,7 @@
+v0.2.4 (2016-03-21)
+-------------------
+- Add runtime sample GIST
+
 v0.2.3 (2016-03-21)
 -------------------
 - Formatting and consistency updates
