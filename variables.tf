@@ -4,12 +4,9 @@
 variable "aws_access_key" {
   description = "Your AWS key (ex. $AWS_ACCESS_KEY_ID)"
 }
-variable "aws_secret_key" {
-  description = "Your AWS secret (ex. $AWS_SECRET_ACCESS_KEY)"
-}
-variable "aws_region" {
-  description = "AWS Region to deploy to"
-  default     = "us-west-1"
+variable "aws_flavor" {
+  description = "AWS Instance type to deploy"
+  default     = "c3.xlarge"
 }
 variable "aws_key_name" {
   description = "Name of the key pair uploaded to AWS"
@@ -17,23 +14,22 @@ variable "aws_key_name" {
 variable "aws_private_key_file" {
   description = "Full path to your local private key"
 }
-variable "aws_vpc_id" {
-  description = "AWS VPC id (ex. vpc-ffffffff)"
+variable "aws_region" {
+  description = "AWS Region to deploy to"
+  default     = "us-west-1"
+}
+variable "aws_secret_key" {
+  description = "Your AWS secret (ex. $AWS_SECRET_ACCESS_KEY)"
 }
 variable "aws_subnet_id" {
   description = "AWS Subnet id (ex. subnet-ffffffff)"
 }
-variable "aws_flavor" {
-  description = "AWS Instance type to deploy"
-  default     = "c3.xlarge"
+variable "aws_vpc_id" {
+  description = "AWS VPC id (ex. vpc-ffffffff)"
 }
 #
 # AMI mapping
 #
-variable "ami_os" {
-  description = "Chef server OS (options: centos7, [centos6], ubuntu16, ubuntu14)"
-  default     = "centos6"
-}
 variable "ami_map" {
   description = "AMI map of OS/region (2016-03-14)"
   default     = {
@@ -89,34 +85,34 @@ variable "ami_map" {
     ubuntu12-sa-east-1      = "ami-2661ec4a"
   }
 }
+variable "ami_os" {
+  description = "Chef server OS (options: centos7, [centos6], ubuntu16, ubuntu14)"
+  default     = "centos6"
+}
 variable "ami_usermap" {
   description = "Default username map for AMI selected"
-  default = {
-    centos7  = "centos"
-    centos6  = "centos"
-    ubuntu16 = "ubuntu"
-    ubuntu14 = "ubuntu"
-    ubuntu12 = "ubuntu"
+  default     = {
+    centos7   = "centos"
+    centos6   = "centos"
+    ubuntu16  = "ubuntu"
+    ubuntu14  = "ubuntu"
+    ubuntu12  = "ubuntu"
   }
 }
 #
 # specific configs
 #
-variable "tag_description" {
-  description = "Chef server AWS description tag text"
-  default     = "Created using Terraform (tf_chef_server)"
-}
-variable "hostname" {
-  description = "Chef server hostname"
-  default     = "localhost"
+variable "allowed_cidrs" {
+  description = "List of CIDRs to allow SSH from (CSV list allowed)"
+  default     = "0.0.0.0/0"
 }
 variable "domain" {
   description = "Chef server domain name"
   default     = "localdomain"
 }
-variable "server_count" {
-  description = "Number of Chef Servers to provision. DO NOT CHANGE!"
-  default     = 1
+variable "hostname" {
+  description = "Chef server hostname"
+  default     = "localhost"
 }
 variable "org_short" {
   description = "Chef server organization name (short form)"
@@ -125,26 +121,6 @@ variable "org_short" {
 variable "org_long" {
   description = "Chef server organization name (long form)"
   default     = "Chef Organization"
-}
-variable "username" {
-  description = "Chef server first user's username"
-  default     = "admin"
-}
-variable "user_firstname" {
-  description = "Chef server first user's first name"
-  default     = "Admin"
-}
-variable "user_lastname" {
-  description = "Chef server first user's last name"
-  default     = "User"
-}
-variable "user_email" {
-  description = "Chef server first user's e-mail address"
-  default     = "admin@domain.tld"
-}
-variable "allowed_cidrs" {
-  description = "List of CIDRs to allow SSH from (CSV list allowed)"
-  default     = "0.0.0.0/0"
 }
 variable "r53" {
   description = "Use Route53"
@@ -158,9 +134,34 @@ variable "r53_zone_id" {
   description = "Route53 Zone ID"
   default     = 0
 }
+variable "server_count" {
+  description = "Number of Chef Servers to provision. DO NOT CHANGE!"
+  default     = 1
+}
 variable "ssl_cert" {
   description = "SSL Certificate in PEM format"
 }
 variable "ssl_key" {
   description = "Key for SSL Certificate"
 }
+variable "tag_description" {
+  description = "Chef server AWS description tag text"
+  default     = "Created using Terraform (tf_chef_server)"
+}
+variable "username" {
+  description = "Chef server first user's username"
+  default     = "admin"
+}
+variable "user_email" {
+  description = "Chef server first user's e-mail address"
+  default     = "admin@domain.tld"
+}
+variable "user_firstname" {
+  description = "Chef server first user's first name"
+  default     = "Admin"
+}
+variable "user_lastname" {
+  description = "Chef server first user's last name"
+  default     = "User"
+}
+
