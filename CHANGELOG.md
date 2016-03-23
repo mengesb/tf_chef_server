@@ -1,3 +1,8 @@
+v0.2.3 (2016-03-21)
+-------------------
+- Formatting and consistency updates
+- No new functionality
+
 v0.2.2 (2016-03-21)
 -------------------
 - Added org validator to output

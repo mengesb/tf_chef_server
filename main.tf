@@ -1,63 +1,63 @@
 # Chef Server AWS security group - https://docs.chef.io/server_firewalls_and_ports.html
 resource "aws_security_group" "chef-server" {
-  name = "${var.hostname}.${var.domain} security group"
+  name        = "${var.hostname}.${var.domain} security group"
   description = "Chef Server ${var.hostname}.${var.domain}"
-  vpc_id = "${var.aws_vpc_id}"
+  vpc_id      = "${var.aws_vpc_id}"
   tags = {
-    Name = "${var.hostname}.${var.domain} security group"
+    Name      = "${var.hostname}.${var.domain} security group"
   }
 }
 # SSH - all
 resource "aws_security_group_rule" "chef-server_allow_22_tcp_allowed_cidrs" {
-  type = "ingress"
-  from_port = 22
-  to_port = 22
-  protocol = "tcp"
+  type        = "ingress"
+  from_port   = 22
+  to_port     = 22
+  protocol    = "tcp"
   cidr_blocks = ["${split(",", var.allowed_cidrs)}"]
   security_group_id = "${aws_security_group.chef-server.id}"
 }
 # HTTP (nginx)
 resource "aws_security_group_rule" "chef-server_allow_80_tcp" {
-  type = "ingress"
-  from_port = 80
-  to_port = 80
-  protocol = "tcp"
+  type        = "ingress"
+  from_port   = 80
+  to_port     = 80
+  protocol    = "tcp"
   cidr_blocks = ["0.0.0.0/0"]
   security_group_id = "${aws_security_group.chef-server.id}"
 }
 # HTTPS (nginx)
 resource "aws_security_group_rule" "chef-server_allow_443_tcp" {
-  type = "ingress"
-  from_port = 443
-  to_port = 443
-  protocol = "tcp"
+  type        = "ingress"
+  from_port   = 443
+  to_port     = 443
+  protocol    = "tcp"
   cidr_blocks = ["0.0.0.0/0"]
   security_group_id = "${aws_security_group.chef-server.id}"
 }
 # oc_bifrost (nginx LB)
 resource "aws_security_group_rule" "chef-server_allow_9683_tcp" {
-  type = "ingress"
-  from_port = 9683
-  to_port = 9683
-  protocol = "tcp"
+  type        = "ingress"
+  from_port   = 9683
+  to_port     = 9683
+  protocol    = "tcp"
   cidr_blocks = ["0.0.0.0/0"]
   security_group_id = "${aws_security_group.chef-server.id}"
 }
 # opscode-push-jobs
 resource "aws_security_group_rule" "chef-server_allow_10000-10003_tcp" {
-  type = "ingress"
-  from_port = 10000
-  to_port = 10003
-  protocol = "tcp"
+  type        = "ingress"
+  from_port   = 10000
+  to_port     = 10003
+  protocol    = "tcp"
   cidr_blocks = ["0.0.0.0/0"]
   security_group_id = "${aws_security_group.chef-server.id}"
 }
 # Egress: ALL
 resource "aws_security_group_rule" "chef-server_allow_egress" {
-  type = "egress"
-  from_port = 0
-  to_port = 0
-  protocol = "-1"
+  type        = "egress"
+  from_port   = 0
+  to_port     = 0
+  protocol    = "-1"
   cidr_blocks = ["0.0.0.0/0"]
   security_group_id = "${aws_security_group.chef-server.id}"
 }
@@ -65,7 +65,7 @@ resource "aws_security_group_rule" "chef-server_allow_egress" {
 provider "aws" {
   access_key = "${var.aws_access_key}"
   secret_key = "${var.aws_secret_key}"
-  region = "${var.aws_region}"
+  region     = "${var.aws_region}"
 }
 # Local prep
 resource "null_resource" "chef-prep" {
@@ -91,29 +91,29 @@ resource "template_file" "attributes-json" {
 resource "template_file" "knife-rb" {
   template = "${path.module}/files/knife-rb.tpl"
   vars {
-    user = "${var.username}"
-    fqdn = "${var.hostname}.${var.domain}"
-    org  = "${var.org_short}"
+    user   = "${var.username}"
+    fqdn   = "${var.hostname}.${var.domain}"
+    org    = "${var.org_short}"
   }
 }
 # Provision Chef Server with Chef cookbook chef-server
 resource "aws_instance" "chef-server" {
-  ami = "${lookup(var.ami_map, format("%s-%s", var.ami_os, var.aws_region))}"
-  count = "${var.server_count}"
+  ami           = "${lookup(var.ami_map, format("%s-%s", var.ami_os, var.aws_region))}"
+  count         = "${var.server_count}"
   instance_type = "${var.aws_flavor}"
-  subnet_id = "${var.aws_subnet_id}"
+  subnet_id     = "${var.aws_subnet_id}"
   vpc_security_group_ids = ["${aws_security_group.chef-server.id}"]
-  key_name = "${var.aws_key_name}"
+  key_name      = "${var.aws_key_name}"
   tags = {
-    Name = "${var.hostname}.${var.domain}"
+    Name        = "${var.hostname}.${var.domain}"
     Description = "${var.tag_description}"
   }
   root_block_device = {
     delete_on_termination = true
   }
   connection {
-    host = "${self.public_ip}"
-    user = "${lookup(var.ami_usermap, var.ami_os)}"
+    host        = "${self.public_ip}"
+    user        = "${lookup(var.ami_usermap, var.ami_os)}"
     private_key = "${var.aws_private_key_file}"
   }
   # Setup
@@ -214,46 +214,46 @@ EOC
 }
 # Hack to solve issue of using a generated resource value
 module "validator-pem" {
-  source = "validator-pem"
+  source        = "validator-pem"
   validator_pem = ".chef/${var.org_short}-validator.pem"
 }
 # Register Chef server against itself
 resource "null_resource" "inception_chef" {
   depends_on = ["aws_instance.chef-server"]
   connection {
-    host = "${aws_instance.chef-server.public_ip}"
-    user = "${lookup(var.ami_usermap, var.ami_os)}"
+    host        = "${aws_instance.chef-server.public_ip}"
+    user        = "${lookup(var.ami_usermap, var.ami_os)}"
     private_key = "${var.aws_private_key_file}"
   }
   # Provision with Chef
   provisioner "chef" {
     attributes_json = "${template_file.attributes-json.rendered}"
-    environment = "_default"
-    run_list = ["recipe[system::default]","recipe[chef-server::default]","recipe[chef-server::addons]"]
-    node_name = "${aws_instance.chef-server.tags.Name}"
-    server_url = "https://${aws_instance.chef-server.tags.Name}/organizations/${var.org_short}"
-    #secret_key = "${file("${var.secret_key_file}")}"
+    environment     = "_default"
+    run_list        = ["recipe[system::default]","recipe[chef-server::default]","recipe[chef-server::addons]"]
+    node_name       = "${aws_instance.chef-server.tags.Name}"
+    server_url      = "https://${aws_instance.chef-server.tags.Name}/organizations/${var.org_short}"
     validation_client_name = "${var.org_short}-validator"
-    validation_key = "${file("${module.validator-pem.validator_pem}")}"
+    validation_key  = "${file("${module.validator-pem.validator_pem}")}"
   }
 }
 # Public Route53 DNS record
 resource "aws_route53_record" "chef-server" {
-  zone_id = "${var.r53_zone_id}"
-  name = "${aws_instance.chef-server.tags.Name}"
-  type = "A"
-  ttl = "${var.r53_ttl}"
-  records = ["${aws_instance.chef-server.public_ip}"]
+  count    = "${var.r53}"
+  zone_id  = "${var.r53_zone_id}"
+  name     = "${aws_instance.chef-server.tags.Name}"
+  type     = "A"
+  ttl      = "${var.r53_ttl}"
+  records  = ["${aws_instance.chef-server.public_ip}"]
 }
 # Generate pretty output format
 resource "template_file" "chef-server-creds" {
   template = "${path.module}/files/chef-server-creds.tpl"
   vars {
-    user = "${var.username}"
-    pass = "${base64sha256(aws_instance.chef-server.id)}"
-    fqdn = "${aws_instance.chef-server.tags.Name}"
-    org = "${var.org_short}"
-    pem = "${module.validator-pem.validator_pem}"
+    user   = "${var.username}"
+    pass   = "${base64sha256(aws_instance.chef-server.id)}"
+    fqdn   = "${aws_instance.chef-server.tags.Name}"
+    org    = "${var.org_short}"
+    pem    = "${module.validator-pem.validator_pem}"
   }
 }
 # Write generated template file
@@ -267,3 +267,4 @@ EOF
 EOC
   }
 }
+

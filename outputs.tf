@@ -5,21 +5,22 @@ output "credentials" {
 output "fqdn" {
   value = "${aws_instance.chef-server.tags.Name}"
 }
-output "private_ip" {
-  value = "${aws_instance.chef-server.private_ip}"
-}
-output "public_ip" {
-  value = "${aws_instance.chef-server.public_ip}"
-}
 output "organization" {
   value = "${var.org_short}"
 }
 output "organization_validator" {
   value = "${module.validator-pem.validator_pem}"
 }
-output "security_group_id" {
-  value = "${aws_security_group.chef-server.id}"
+output "private_ip" {
+  value = "${aws_instance.chef-server.private_ip}"
+}
+output "public_ip" {
+  value = "${aws_instance.chef-server.public_ip}"
 }
 output "secret_file" {
   value = ".chef/encrypted_data_bag_secret"
 }
+output "security_group_id" {
+  value = "${aws_security_group.chef-server.id}"
+}
+
