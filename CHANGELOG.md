@@ -1,3 +1,8 @@
+v0.2.5 (2016-03-22)
+-------------------
+- Added handle for internal DNS on Route53
+- Added recipe[system::default] to run_list
+
 v0.2.4 (2016-03-21)
 -------------------
 - Add runtime sample GIST
