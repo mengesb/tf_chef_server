@@ -166,7 +166,7 @@ EOC
   # Run chef-solo and get us a Chef server
   provisioner "remote-exec" {
     inline = [
-      "sudo chef-solo -j .chef/dna.json -o 'recipe[chef-server::default],recipe[chef-server::addons]'",
+      "sudo chef-solo -j .chef/dna.json -o 'recipe[system::default],recipe[chef-server::default],recipe[chef-server::addons]'",
     ]
   }
   # Create first user and org
@@ -244,6 +244,15 @@ resource "aws_route53_record" "chef-server" {
   type     = "A"
   ttl      = "${var.r53_ttl}"
   records  = ["${aws_instance.chef-server.public_ip}"]
+}
+# Private Route53 DNS record
+resource "aws_route53_record" "chef-server-private" {
+  count    = "${var.r53}"
+  zone_id  = "${var.r53_zone_internal_id}"
+  name     = "${aws_instance.chef-server.tags.Name}"
+  type     = "A"
+  ttl      = "${var.r53_ttl}"
+  records  = ["${aws_instance.chef-server.private_ip}"]
 }
 # Generate pretty output format
 resource "template_file" "chef-server-creds" {

@@ -130,8 +130,12 @@ variable "r53_ttl" {
   description = "Route53 A record TTL (Default: 180)"
   default     = 180
 }
+variable "r53_zone_internal_id" {
+  description = "Route53 zone id for internal DNS"
+  default     = 0
+}
 variable "r53_zone_id" {
-  description = "Route53 Zone ID"
+  description = "Route53 zone id"
   default     = 0
 }
 variable "server_count" {
