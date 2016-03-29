@@ -8,6 +8,7 @@ Terraform module to setup a Chef Server in standalone mode. Nothing spectacular 
   * AWS subnet id
   * AWS VPC id
   * SSL certificate/key for created instance
+  * Terraform >= 0.6.14
 * Uses a public IP and public DNS
 * Creates default security group as follows:
   * 22/tcp: SSH
