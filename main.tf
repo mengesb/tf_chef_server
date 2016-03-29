@@ -80,7 +80,7 @@ EOF
 }
 # Chef provisiong attributes_json and .chef/dna.json templating
 resource "template_file" "attributes-json" {
-  template = "${path.module}/files/attributes-json.tpl"
+  template = "${file("${path.module}/files/attributes-json.tpl")}"
   vars {
     host   = "${var.hostname}"
     domain = "${var.domain}"
@@ -89,7 +89,7 @@ resource "template_file" "attributes-json" {
 }
 # knife.rb templating
 resource "template_file" "knife-rb" {
-  template = "${path.module}/files/knife-rb.tpl"
+  template = "${file("${path.module}/files/knife-rb.tpl")}"
   vars {
     user   = "${var.username}"
     fqdn   = "${var.hostname}.${var.domain}"
@@ -256,7 +256,7 @@ resource "aws_route53_record" "chef-server-private" {
 }
 # Generate pretty output format
 resource "template_file" "chef-server-creds" {
-  template = "${path.module}/files/chef-server-creds.tpl"
+  template = "${file("${path.module}/files/chef-server-creds.tpl")}"
   vars {
     user   = "${var.username}"
     pass   = "${base64sha256(aws_instance.chef-server.id)}"

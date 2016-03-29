@@ -1,3 +1,7 @@
+v0.2.6 (2016-03-28)
+-------------------
+- Syntax update per Terraform [0.6.14](https://github.com/hashicorp/terraform/blob/master/CHANGELOG.md#0614-march-21-2016)
+
 v0.2.5 (2016-03-22)
 -------------------
 - Added handle for internal DNS on Route53
