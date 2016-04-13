@@ -106,6 +106,10 @@ variable "allowed_cidrs" {
   description = "List of CIDRs to allow SSH from (CSV list allowed)"
   default     = "0.0.0.0/0"
 }
+variable "client_version" {
+  description = "Version of the chef-client software to install"
+  default     = "12.8.1"
+}
 variable "domain" {
   description = "Chef server domain name"
   default     = "localdomain"
@@ -113,6 +117,10 @@ variable "domain" {
 variable "hostname" {
   description = "Chef server hostname"
   default     = "localhost"
+}
+variable "log_to_file" {
+  description = "Output chef-client runtime to logfiles/"
+  default     = true
 }
 variable "org_short" {
   description = "Chef server organization name (short form)"
@@ -122,21 +130,9 @@ variable "org_long" {
   description = "Chef server organization name (long form)"
   default     = "Chef Organization"
 }
-variable "r53" {
-  description = "Use Route53"
-  default     = 0
-}
-variable "r53_ttl" {
-  description = "Route53 A record TTL (Default: 180)"
-  default     = 180
-}
-variable "r53_zone_internal_id" {
-  description = "Route53 zone id for internal DNS"
-  default     = 0
-}
-variable "r53_zone_id" {
-  description = "Route53 zone id"
-  default     = 0
+variable "root_delete_termination" {
+  description = "Delete server root block device on termination"
+  default     = true
 }
 variable "server_count" {
   description = "Number of Chef Servers to provision. DO NOT CHANGE!"

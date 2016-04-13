@@ -7,7 +7,7 @@ resource "aws_security_group" "chef-server" {
     Name      = "${var.hostname}.${var.domain} security group"
   }
 }
-# SSH - all
+# SSH
 resource "aws_security_group_rule" "chef-server_allow_22_tcp_allowed_cidrs" {
   type        = "ingress"
   from_port   = 22
@@ -67,7 +67,9 @@ provider "aws" {
   secret_key = "${var.aws_secret_key}"
   region     = "${var.aws_region}"
 }
+#
 # Local prep
+#
 resource "null_resource" "chef-prep" {
   provisioner "local-exec" {
     command = <<EOF
@@ -96,20 +98,25 @@ resource "template_file" "knife-rb" {
     org    = "${var.org_short}"
   }
 }
-# Provision Chef Server with Chef cookbook chef-server
+#
+# Provision server
+#
 resource "aws_instance" "chef-server" {
-  ami           = "${lookup(var.ami_map, format("%s-%s", var.ami_os, var.aws_region))}"
+  depends_on    = ["null_resource.chef-prep","template_file.attributes-json","template_file.knife-rb"]
+  ami           = "${lookup(var.ami_map, "${var.ami_os}-${var.aws_region}")}"
   count         = "${var.server_count}"
   instance_type = "${var.aws_flavor}"
   subnet_id     = "${var.aws_subnet_id}"
   vpc_security_group_ids = ["${aws_security_group.chef-server.id}"]
   key_name      = "${var.aws_key_name}"
+  # AWS tagging
   tags = {
     Name        = "${var.hostname}.${var.domain}"
     Description = "${var.tag_description}"
   }
+  # Delete root on termination
   root_block_device = {
-    delete_on_termination = true
+    delete_on_termination = "${var.root_delete_termination}"
   }
   connection {
     host        = "${self.public_ip}"
@@ -124,8 +131,8 @@ resource "aws_instance" "chef-server" {
       "sudo service iptables stop",
       "sudo chkconfig iptables off",
       "sudo ufw disable",
-      "curl -sL https://www.chef.io/chef/install.sh | sudo bash",
-      "echo 'Say WHAT one more time'"
+      "curl -L https://omnitruck.chef.io/install.sh | sudo bash -s -- -v ${var.client_version}",
+      "echo 'Version ${var.client_version} of chef-client installed'"
     ]
   }
   # Copy to server script to download necessary cookbooks
@@ -182,10 +189,6 @@ EOC
       "sudo chown -R ${lookup(var.ami_usermap, var.ami_os)} .chef"
     ]
   }
-  # Remove any conflicting user key
-  provisioner "local-exec" {
-    command = "rm -rf .chef/${var.username}.pem .chef/${var.org_short}-validator.pem"
-  }
   # Copy back .chef files
   provisioner "local-exec" {
     command = "scp -r -o stricthostkeychecking=no -i ${var.aws_private_key_file} ${lookup(var.ami_usermap, var.ami_os)}@${self.public_ip}:.chef/* .chef/"
@@ -212,14 +215,18 @@ EOC
     ]
   }
 }
-# Hack to solve issue of using a generated resource value
-module "validator-pem" {
-  source        = "validator-pem"
-  validator_pem = ".chef/${var.org_short}-validator.pem"
+# File sourcing redirection
+module "validator" {
+  source = "github.com/mengesb/tf_filemodule"
+  file   = ".chef/${var.org_short}-validator.pem"
+}
+module "encrypted_data_bag_secret" {
+  source = "github.com/mengesb/tf_filemodule"
+  file   = ".chef/encrypted_data_bag_secret"
 }
 # Register Chef server against itself
-resource "null_resource" "inception_chef" {
-  depends_on = ["aws_instance.chef-server"]
+resource "null_resource" "chef_chef-server" {
+  depends_on = ["null_resource.chef-prep","template_file.attributes-json","template_file.knife-rb","aws_instance.chef-server"]
   connection {
     host        = "${aws_instance.chef-server.public_ip}"
     user        = "${lookup(var.ami_usermap, var.ami_os)}"
@@ -229,30 +236,14 @@ resource "null_resource" "inception_chef" {
   provisioner "chef" {
     attributes_json = "${template_file.attributes-json.rendered}"
     environment     = "_default"
-    run_list        = ["recipe[system::default]","recipe[chef-server::default]","recipe[chef-server::addons]"]
+    log_to_file     = "${var.log_to_file}"
     node_name       = "${aws_instance.chef-server.tags.Name}"
+    run_list        = ["recipe[system::default]","recipe[chef-server::default]","recipe[chef-server::addons]"]
     server_url      = "https://${aws_instance.chef-server.tags.Name}/organizations/${var.org_short}"
     validation_client_name = "${var.org_short}-validator"
-    validation_key  = "${file("${module.validator-pem.validator_pem}")}"
+    validation_key  = "${file("${module.validator.file}")}"
+    version         = "${var.client_version}"
   }
-}
-# Public Route53 DNS record
-resource "aws_route53_record" "chef-server" {
-  count    = "${var.r53}"
-  zone_id  = "${var.r53_zone_id}"
-  name     = "${aws_instance.chef-server.tags.Name}"
-  type     = "A"
-  ttl      = "${var.r53_ttl}"
-  records  = ["${aws_instance.chef-server.public_ip}"]
-}
-# Private Route53 DNS record
-resource "aws_route53_record" "chef-server-private" {
-  count    = "${var.r53}"
-  zone_id  = "${var.r53_zone_internal_id}"
-  name     = "${aws_instance.chef-server.tags.Name}"
-  type     = "A"
-  ttl      = "${var.r53_ttl}"
-  records  = ["${aws_instance.chef-server.private_ip}"]
 }
 # Generate pretty output format
 resource "template_file" "chef-server-creds" {
@@ -262,7 +253,7 @@ resource "template_file" "chef-server-creds" {
     pass   = "${base64sha256(aws_instance.chef-server.id)}"
     fqdn   = "${aws_instance.chef-server.tags.Name}"
     org    = "${var.org_short}"
-    pem    = "${module.validator-pem.validator_pem}"
+    pem    = "${module.validator.file}"
   }
 }
 # Write generated template file
