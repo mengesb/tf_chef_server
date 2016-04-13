@@ -138,7 +138,7 @@ resource "aws_instance" "chef-server" {
   }
   # Copy to server script to download necessary cookbooks
   provisioner "file" {
-    source = "files/chef-cookbooks.sh"
+    source = "${path.module}/files/chef-cookbooks.sh"
     destination = ".chef/chef-cookbooks.sh"
   }
   # Run script to download necessary cookbooks
