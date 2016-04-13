@@ -17,6 +17,27 @@ Terraform module to setup a Chef Server in standalone mode. Nothing spectacular 
   * 10000-10003: Chef Push Jobs
 * Understand Terraform and ability to read the source
 
+## Usage
+
+### Module
+
+In your terraform plan:
+```
+module "module_name_here" {
+  source = "github.com/mengesb/tf_chef_server"
+  aws_access_key = "<key>"
+  ...
+}
+```
+
+### Directly
+
+1. Clone this repo: `git clone https://github.com/mengesb/tf_chef_server.git`
+2. Get dependencies: `terraform get`
+3. Generate and poulate a local `terraform.tfvars` to not be prompted for all inputs
+4. Test the plan: `terraform plan`
+5. Apply the plan: `terraform apply`
+
 ## Supported OSes
 All supported OSes are 64-bit and HVM (though PV should be supported)
 
@@ -47,17 +68,16 @@ These resources will incur charges on your AWS bill. It is your responsibility t
 ### tf_chef_server variables
 
 * `allowed_cidrs`: The comma seperated list of addresses in CIDR format to allow SSH access. Default: `0.0.0.0/0`
-* `domain`: Chef server's basename. Default: `localhost`
-* `hostname`: Chef server's basename. Default: `localdomain`
+* `client_version`: Chef client version. Default: `12.8.1`
+* `domain`: Server's basename. Default: `localhost`
+* `hostname`: Server's basename. Default: `localdomain`
+* `log_to_file`: Log chef-client to file. Default: `true`
 * `org_short`: Chef organization to create. Default: `chef`
 * `org_long`: Chef organization long name. Default: `Chef Organization`
-* `r53`: Boolean determines if Route53 will be used or not. Default: `0`
-* `r53_ttl`: Time to Live (TTL) setting for Route53 A record to be created. Default: `180`
-* `r53_zone_id`: AWS Route53 Zone ID to add an A record for the Chef Server
-* `r53_zone_internal_id`: AWS Route53 Internal Zone ID to add an A record for the Chef Server
-* `server_count`: Chef Server count. Default: `1`; DO NOT CHANGE!
-* `ssl_cert`: Chef Server SSL certificate in PEM format
-* `ssl_key`: Chef Server SSL certificate key
+* `root_delete_termination`: Delete root device on VM termination. Default: `true`
+* `server_count`: Server count. Default: `1`; DO NOT CHANGE!
+* `ssl_cert`: SSL certificate in PEM format
+* `ssl_key`: SSL certificate key
 * `tag_description`: Text field tag 'Description'
 * `username`: First Chef Server user. Default: `admin`
 * `user_email`: Chef Server user's e-mail address. Default: `admin@domain.tld`
@@ -108,12 +128,13 @@ ami_usermap.<ami_os> = "value"
 ## Outputs
 
 * `credentials`: Formatted text output with details about the Chef Server
-* `fqdn`: The fully qualified domain name of the Chef Server
+* `fqdn`: The fully qualified domain name of the server
 * `organization`: The short form name of the organization created on the Chef Server
+* `organization_validator`: Validation PEM file
 * `public_ip`: The public IP address of the instance
 * `private_ip`: The private IP address of the instance
-* `security_group_id`: The AWS security group id for this instance
 * `secret_file`: The encrypted data bag secret file
+* `security_group_id`: The AWS security group id for this instance
 
 ## Contributors
 
