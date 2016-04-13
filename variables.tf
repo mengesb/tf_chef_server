@@ -130,6 +130,10 @@ variable "org_long" {
   description = "Chef server organization name (long form)"
   default     = "Chef Organization"
 }
+variable "public_ip" {
+  description = "Associate a public IP to the instance"
+  default     = true
+}
 variable "root_delete_termination" {
   description = "Delete server root block device on termination"
   default     = true

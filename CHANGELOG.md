@@ -3,6 +3,10 @@ tf_chef_server CHANGELOG
 
 This file is used to list changes made in each version of the tf_chef_server Terraform plan.
 
+v0.2.8 (2016-04-13)
+-------------------
+- [Brian Menges] - Add `public_ip` input variable to indicate public IP association to AWS instance
+
 v0.2.7 (2016-04-13)
 -------------------
 - [Brian Menges] - Reformat [CHANGELOG.md](CHANGELOG.md)
