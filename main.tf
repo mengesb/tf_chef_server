@@ -106,6 +106,7 @@ resource "aws_instance" "chef-server" {
   ami           = "${lookup(var.ami_map, "${var.ami_os}-${var.aws_region}")}"
   count         = "${var.server_count}"
   instance_type = "${var.aws_flavor}"
+  associate_public_ip_address = "${var.public_ip}"
   subnet_id     = "${var.aws_subnet_id}"
   vpc_security_group_ids = ["${aws_security_group.chef-server.id}"]
   key_name      = "${var.aws_key_name}"

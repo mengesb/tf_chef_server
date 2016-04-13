@@ -72,6 +72,7 @@ These resources will incur charges on your AWS bill. It is your responsibility t
 * `domain`: Server's basename. Default: `localhost`
 * `hostname`: Server's basename. Default: `localdomain`
 * `log_to_file`: Log chef-client to file. Default: `true`
+* `public_ip`: Associate public IP to instance. Default `true`
 * `org_short`: Chef organization to create. Default: `chef`
 * `org_long`: Chef organization long name. Default: `Chef Organization`
 * `root_delete_termination`: Delete root device on VM termination. Default: `true`
