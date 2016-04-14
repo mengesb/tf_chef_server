@@ -3,6 +3,10 @@ tf_chef_server CHANGELOG
 
 This file is used to list changes made in each version of the tf_chef_server Terraform plan.
 
+v0.2.10 (2016-04-14)
+-------------------
+- [Brian Menges] - Add `knife_rb` output
+
 v0.2.9 (2016-04-13)
 -------------------
 - [Brian Menges] - Add `${path.module}` to cookbook script file transfer resource

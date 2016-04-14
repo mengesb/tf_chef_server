@@ -130,6 +130,7 @@ ami_usermap.<ami_os> = "value"
 
 * `credentials`: Formatted text output with details about the Chef Server
 * `fqdn`: The fully qualified domain name of the server
+* `knife_rb`: Chef knife.rb file for user generated
 * `organization`: The short form name of the organization created on the Chef Server
 * `organization_validator`: Validation PEM file
 * `public_ip`: The public IP address of the instance

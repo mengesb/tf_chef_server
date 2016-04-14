@@ -225,6 +225,10 @@ module "encrypted_data_bag_secret" {
   source = "github.com/mengesb/tf_filemodule"
   file   = ".chef/encrypted_data_bag_secret"
 }
+module "knife_rb" {
+  source = "github.com/mengesb/tf_filemodule"
+  file   = ".chef/knife.rb"
+}
 # Register Chef server against itself
 resource "null_resource" "chef_chef-server" {
   depends_on = ["null_resource.chef-prep","template_file.attributes-json","template_file.knife-rb","aws_instance.chef-server"]
