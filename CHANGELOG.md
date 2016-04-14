@@ -3,6 +3,10 @@ tf_chef_server CHANGELOG
 
 This file is used to list changes made in each version of the tf_chef_server Terraform plan.
 
+v0.2.11 (2016-04-14)
+-------------------
+- [Brian Menges] - Add `skip_install = true` to chef-client run (already installed, don't need to do it again)
+
 v0.2.10 (2016-04-14)
 -------------------
 - [Brian Menges] - Add `knife_rb` output
