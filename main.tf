@@ -245,6 +245,7 @@ resource "null_resource" "chef_chef-server" {
     node_name       = "${aws_instance.chef-server.tags.Name}"
     run_list        = ["recipe[system::default]","recipe[chef-server::default]","recipe[chef-server::addons]"]
     server_url      = "https://${aws_instance.chef-server.tags.Name}/organizations/${var.org_short}"
+    skip_install    = true
     validation_client_name = "${var.org_short}-validator"
     validation_key  = "${file("${module.validator.file}")}"
     version         = "${var.client_version}"
