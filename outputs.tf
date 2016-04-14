@@ -5,6 +5,9 @@ output "credentials" {
 output "fqdn" {
   value = "${aws_instance.chef-server.tags.Name}"
 }
+output "knife_rb" {
+  value = "${module.knife_rb.file}"
+}
 output "organization" {
   value = "${var.org_short}"
 }
