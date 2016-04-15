@@ -3,6 +3,10 @@ tf_chef_server CHANGELOG
 
 This file is used to list changes made in each version of the tf_chef_server Terraform plan.
 
+v0.2.14 (2016-04-15)
+-------------------
+- [Brian Menges] - Add `chef_handler` cookbook
+
 v0.2.13 (2016-04-15)
 -------------------
 - [Brian Menges] - Add `chef-client` cookbook and dependencies to `chef-cookbooks.sh`
