@@ -1,7 +1,7 @@
 {
   "fqdn": "${host}.${domain}",
    "chef_client": {
-     "init_style": "none",
+     "init_style": "none"
    },
   "chef-server": {
     "addons": [

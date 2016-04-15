@@ -3,6 +3,11 @@ tf_chef_server CHANGELOG
 
 This file is used to list changes made in each version of the tf_chef_server Terraform plan.
 
+v0.2.13 (2016-04-15)
+-------------------
+- [Brian Menges] - Add `chef-client` cookbook and dependencies to `chef-cookbooks.sh`
+- [Brian Menges] - Fix syntax error in `attributes-json.tpl`
+
 v0.2.12 (2016-04-15)
 -------------------
 - [Brian Menges] - Update `attributes-json.tpl`, set `system` cookbook to restart network immediately on set
