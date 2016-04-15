@@ -3,6 +3,12 @@ tf_chef_server CHANGELOG
 
 This file is used to list changes made in each version of the tf_chef_server Terraform plan.
 
+v0.2.12 (2016-04-15)
+-------------------
+- [Brian Menges] - Update `attributes-json.tpl`, set `system` cookbook to restart network immediately on set
+- [Brian Menges] - Alphabetize `attributes-json.tpl`, except for `fqdn`
+- [Brian Menges] - Add attributes and run_list to setup chef-client as cron job with splay
+
 v0.2.11 (2016-04-14)
 -------------------
 - [Brian Menges] - Add `skip_install = true` to chef-client run (already installed, don't need to do it again)

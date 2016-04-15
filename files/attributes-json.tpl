@@ -1,24 +1,27 @@
 {
   "fqdn": "${host}.${domain}",
+   "chef_client": {
+     "init_style": "none",
+   },
   "chef-server": {
-    "api_fqdn": "${host}.${domain}",
-    "topology": "standalone",
     "addons": [
       "manage",
-      "reporting",
-      "push-server"
+      "push-server",
+      "reporting"
     ],
-    "configuration": "nginx['ssl_certificate'] = '/var/chef/ssl/${host}.${domain}.pem'\nnginx['ssl_certificate_key'] = '/var/chef/ssl/${host}.${domain}.key'"
+    "api_fqdn": "${host}.${domain}",
+    "configuration": "nginx['ssl_certificate'] = '/var/chef/ssl/${host}.${domain}.pem'\nnginx['ssl_certificate_key'] = '/var/chef/ssl/${host}.${domain}.key'",
+    "topology": "standalone"
   },
   "firewall": {
     "allow_established": true,
     "allow_ssh": true
   },
   "system": {
-    "short_hostname": "${host}",
+    "delay_network_restart": false,
     "domain_name": "${domain}",
-    "manage_hostsfile": true
+    "manage_hostsfile": true,
+    "short_hostname": "${host}"
   },
   "tags": []
 }
-
