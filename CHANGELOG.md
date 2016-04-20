@@ -3,6 +3,12 @@ tf_chef_server CHANGELOG
 
 This file is used to list changes made in each version of the tf_chef_server Terraform plan.
 
+v1.0.0 (2016-04-20)
+-------------------
+- [Brian Menges] - Update HEREDOC syntax use
+- [Brian Menges] - Code review
+- [Brian Menges] - Release v1.0.0
+
 v0.2.14 (2016-04-15)
 -------------------
 - [Brian Menges] - Add `chef_handler` cookbook
