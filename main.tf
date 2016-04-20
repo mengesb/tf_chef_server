@@ -72,12 +72,12 @@ provider "aws" {
 #
 resource "null_resource" "chef-prep" {
   provisioner "local-exec" {
-    command = <<EOF
-rm -rf .chef
-mkdir -p .chef
-openssl rand -base64 512 | tr -d '\r\n' > .chef/encrypted_data_bag_secret
-echo "Local prep complete"
-EOF
+    command = <<-EOF
+      rm -rf .chef
+      mkdir -p .chef
+      openssl rand -base64 512 | tr -d '\r\n' > .chef/encrypted_data_bag_secret
+      echo "Local prep complete"
+      EOF
   }
 }
 # Chef provisiong attributes_json and .chef/dna.json templating
@@ -159,11 +159,11 @@ resource "aws_instance" "chef-server" {
   }
   # Write .chef/dna.json for chef-solo run
   provisioner "remote-exec" {
-    inline = <<EOC
-cat > .chef/dna.json <<EOF
-${template_file.attributes-json.rendered}
-EOF
-EOC
+    inline = [
+      "cat > .chef/dna.json <<EOF",
+      "${template_file.attributes-json.rendered}",
+      "EOF",
+    ]
   }
   # Move certs
   provisioner "remote-exec" {
@@ -196,12 +196,12 @@ EOC
   }
   # Generate knife.rb
   provisioner "local-exec" {
-    command = <<EOC
-[ -f .chef/knife.rb ] && rm -f .chef/knife.rb
-cat > .chef/knife.rb <<EOF
-${template_file.knife-rb.rendered}
-EOF
-EOC
+    command = <<-EOC
+      [ -f .chef/knife.rb ] && rm -f .chef/knife.rb
+      cat > .chef/knife.rb <<EOF
+      ${template_file.knife-rb.rendered}
+      EOF
+      EOC
   }
   # Upload knife.rb
   provisioner "file" {
@@ -265,12 +265,12 @@ resource "template_file" "chef-server-creds" {
 # Write generated template file
 resource "null_resource" "write-files" {
   provisioner "local-exec" {
-    command = <<EOC
-[ -f .chef/chef-server.creds ] && rm -f .chef/chef-server.creds
-cat > .chef/chef-server.creds <<EOF
-${template_file.chef-server-creds.rendered}
-EOF
-EOC
+    command = <<-EOC
+      [ -f .chef/chef-server.creds ] && rm -f .chef/chef-server.creds
+      cat > .chef/chef-server.creds <<EOF
+      ${template_file.chef-server-creds.rendered}
+      EOF
+      EOC
   }
 }
 
