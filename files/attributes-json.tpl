@@ -6,7 +6,7 @@
   "chef-server": {
     "addons": [
       "manage",
-      "push-server",
+      "push-jobs-server",
       "reporting"
     ],
     "api_fqdn": "${host}.${domain}",
