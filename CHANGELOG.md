@@ -3,6 +3,10 @@ tf_chef_server CHANGELOG
 
 This file is used to list changes made in each version of the tf_chef_server Terraform plan.
 
+v1.0.2 (2016-04-20)
+-------------------
+- [Brian Menges] - Chef ingredient warning: push-server deprecated, use push-jobs-server
+
 v1.0.1 (2016-04-20)
 -------------------
 - [Brian Menges] - Add recipe['chef-client::cron'] to run_list
