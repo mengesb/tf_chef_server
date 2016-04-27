@@ -1,5 +1,6 @@
 Username: ${user}
 Password: ${pass}
-User PEM: ${pem}
+User PEM: ${user_p}
 Organization: ${org}
+Org Validator: ${pem}
 Web login: https://${fqdn}/organizations/${org}
