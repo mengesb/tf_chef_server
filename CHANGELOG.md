@@ -3,6 +3,10 @@ tf_chef_server CHANGELOG
 
 This file is used to list changes made in each version of the tf_chef_server Terraform plan.
 
+v1.0.3 (2016-04-26)
+-------------------
+- [Brian Menges] - Minor update to [chef-server-creds.tpl](files/chef-server-creds.tpl)
+
 v1.0.2 (2016-04-20)
 -------------------
 - [Brian Menges] - Chef ingredient warning: push-server deprecated, use push-jobs-server
