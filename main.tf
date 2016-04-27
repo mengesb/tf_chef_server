@@ -217,10 +217,6 @@ resource "aws_instance" "chef-server" {
   }
 }
 # File sourcing redirection
-module "validator" {
-  source = "github.com/mengesb/tf_filemodule"
-  file   = ".chef/${var.org_short}-validator.pem"
-}
 module "encrypted_data_bag_secret" {
   source = "github.com/mengesb/tf_filemodule"
   file   = ".chef/encrypted_data_bag_secret"
@@ -228,6 +224,14 @@ module "encrypted_data_bag_secret" {
 module "knife_rb" {
   source = "github.com/mengesb/tf_filemodule"
   file   = ".chef/knife.rb"
+}
+module "user_pem" {
+  source = "github.com/mengesb/tf_filemodule"
+  file   = ".chef/${var.username}.pem"
+}
+module "validator" {
+  source = "github.com/mengesb/tf_filemodule"
+  file   = ".chef/${var.org_short}-validator.pem"
 }
 # Register Chef server against itself
 resource "null_resource" "chef_chef-server" {
@@ -257,6 +261,7 @@ resource "template_file" "chef-server-creds" {
   vars {
     user   = "${var.username}"
     pass   = "${base64sha256(aws_instance.chef-server.id)}"
+    user_p = "${module.user_pem.file}"
     fqdn   = "${aws_instance.chef-server.tags.Name}"
     org    = "${var.org_short}"
     pem    = "${module.validator.file}"

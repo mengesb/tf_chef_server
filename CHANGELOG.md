@@ -3,6 +3,11 @@ tf_chef_server CHANGELOG
 
 This file is used to list changes made in each version of the tf_chef_server Terraform plan.
 
+v1.0.4 (2016-04-26)
+-------------------
+- [Brian Menges] - Fix [chef-server-creds](files/chef-server-creds.tpl) template. Specify User PEM and Org Validator files correctly
+- [Brian Menges] - Move module `validator` down in file sourcing redirection block
+
 v1.0.3 (2016-04-26)
 -------------------
 - [Brian Menges] - Minor update to [chef-server-creds.tpl](files/chef-server-creds.tpl)
