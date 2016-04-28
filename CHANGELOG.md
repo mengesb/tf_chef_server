@@ -3,6 +3,13 @@ tf_chef_server CHANGELOG
 
 This file is used to list changes made in each version of the tf_chef_server Terraform plan.
 
+v1.0.5 (2016-04-28)
+-------------------
+- [Brian Menges] - Require users of plan to specify `accept_license` and set to `1` to indicate agreement with [Chef MLSA](https://www.chef.io/online-master-agreement/)
+- [Brian Menges] - Implement `null_resource.chef_mlsa` between prep and chef-solo run
+- [Brian Menges] - Update a few `depends_on` blocks
+- [Brian Menges] - Fix an scp copy back for files
+
 v1.0.4 (2016-04-26)
 -------------------
 - [Brian Menges] - Fix [chef-server-creds](files/chef-server-creds.tpl) template. Specify User PEM and Org Validator files correctly
