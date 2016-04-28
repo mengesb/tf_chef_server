@@ -102,6 +102,10 @@ variable "ami_usermap" {
 #
 # specific configs
 #
+variable "accept_license" {
+  description = "Acceptance of the Chef MLSA: https://www.chef.io/online-master-agreement/"
+  default     = 0
+}
 variable "allowed_cidrs" {
   description = "List of CIDRs to allow SSH from (CSV list allowed)"
   default     = "0.0.0.0/0"

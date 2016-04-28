@@ -67,6 +67,7 @@ These resources will incur charges on your AWS bill. It is your responsibility t
 
 ### tf_chef_server variables
 
+* `accept_license`: [Chef MLSA license](https://www.chef.io/online-master-agreement/) acceptance indicator. Default: `0`; change to `1` to indicate agreement
 * `allowed_cidrs`: The comma seperated list of addresses in CIDR format to allow SSH access. Default: `0.0.0.0/0`
 * `client_version`: Chef client version. Default: `12.8.1`
 * `domain`: Server's basename. Default: `localhost`

@@ -102,7 +102,7 @@ resource "template_file" "knife-rb" {
 # Provision server
 #
 resource "aws_instance" "chef-server" {
-  depends_on    = ["null_resource.chef-prep","template_file.attributes-json","template_file.knife-rb"]
+  depends_on    = ["null_resource.chef-prep"]
   ami           = "${lookup(var.ami_map, "${var.ami_os}-${var.aws_region}")}"
   count         = "${var.server_count}"
   instance_type = "${var.aws_flavor}"
@@ -171,6 +171,33 @@ resource "aws_instance" "chef-server" {
       "sudo mv .chef/${var.hostname}.${var.domain}.* /var/chef/ssl/"
     ]
   }
+}
+#
+# Accept Chef MLSA
+#
+resource "null_resource" "chef_mlsa" {
+  depends_on = ["aws_instance.chef-server"]
+  count = "${var.accept_license}"
+  connection {
+    host        = "${aws_instance.chef-server.public_ip}"
+    user        = "${lookup(var.ami_usermap, var.ami_os)}"
+    private_key = "${var.aws_private_key_file}"
+  }
+  provisioner "remote-exec" {
+    inline = [
+      "sudo mkdir -p /var/opt/chef-manage /var/opt/opscode-push-jobs-server /var/opt/opscode-reporting",
+      "sudo touch /var/opt/chef-manage/.license.accepted /var/opt/opscode-push-jobs-server/.license.accepted /var/opt/opscode-reporting/.license.accepted",
+      "echo 'Chef MLSA Accepted: https://www.chef.io/online-master-agreement/'"
+    ]
+  }
+}
+resource "null_resource" "chef_server" {
+  depends_on = ["aws_instance.chef-server"]
+  connection {
+    host        = "${aws_instance.chef-server.public_ip}"
+    user        = "${lookup(var.ami_usermap, var.ami_os)}"
+    private_key = "${var.aws_private_key_file}"
+  }
   # Run chef-solo and get us a Chef server
   provisioner "remote-exec" {
     inline = [
@@ -192,7 +219,7 @@ resource "aws_instance" "chef-server" {
   }
   # Copy back .chef files
   provisioner "local-exec" {
-    command = "scp -r -o stricthostkeychecking=no -i ${var.aws_private_key_file} ${lookup(var.ami_usermap, var.ami_os)}@${self.public_ip}:.chef/* .chef/"
+    command = "scp -r -o stricthostkeychecking=no -i ${var.aws_private_key_file} ${lookup(var.ami_usermap, var.ami_os)}@${aws_instance.chef-server.public_ip}:.chef/* .chef/"
   }
   # Generate knife.rb
   provisioner "local-exec" {
@@ -235,7 +262,7 @@ module "validator" {
 }
 # Register Chef server against itself
 resource "null_resource" "chef_chef-server" {
-  depends_on = ["null_resource.chef-prep","template_file.attributes-json","template_file.knife-rb","aws_instance.chef-server"]
+  depends_on = ["aws_instance.chef-server","null_resource.chef_mlsa","null_resource.chef_server"]
   connection {
     host        = "${aws_instance.chef-server.public_ip}"
     user        = "${lookup(var.ami_usermap, var.ami_os)}"
@@ -257,6 +284,7 @@ resource "null_resource" "chef_chef-server" {
 }
 # Generate pretty output format
 resource "template_file" "chef-server-creds" {
+  depends_on = ["null_resource.chef_chef-server"]
   template = "${file("${path.module}/files/chef-server-creds.tpl")}"
   vars {
     user   = "${var.username}"
