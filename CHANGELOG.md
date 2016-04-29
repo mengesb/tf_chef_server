@@ -3,6 +3,10 @@ tf_chef_server CHANGELOG
 
 This file is used to list changes made in each version of the tf_chef_server Terraform plan.
 
+v1.0.6 (2016-04-28)
+-------------------
+- [Brian Menges] - Attempt simplier method to `accept_license`
+
 v1.0.5 (2016-04-28)
 -------------------
 - [Brian Menges] - Require users of plan to specify `accept_license` and set to `1` to indicate agreement with [Chef MLSA](https://www.chef.io/online-master-agreement/)
