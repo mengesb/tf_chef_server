@@ -99,10 +99,22 @@ resource "template_file" "knife-rb" {
   }
 }
 #
+# Accept Chef MLSA
+#
+resource "null_resource" "chef_mlsa" {
+  depends_on = ["null_resource.chef-prep"]
+  count = "${var.accept_license}"
+  provisioner "local-exec" {
+    command = <<-EOC
+      touch .chef/.license.accepted
+      EOC
+  }
+}
+#
 # Provision server
 #
 resource "aws_instance" "chef-server" {
-  depends_on    = ["null_resource.chef-prep"]
+  depends_on    = ["null_resource.chef-prep","null_resource.chef_mlsa"]
   ami           = "${lookup(var.ami_map, "${var.ami_os}-${var.aws_region}")}"
   count         = "${var.server_count}"
   instance_type = "${var.aws_flavor}"
@@ -149,13 +161,18 @@ resource "aws_instance" "chef-server" {
   }
   # Put certificate key
   provisioner "file" {
-    source = "${var.ssl_key}"
+    source      = "${var.ssl_key}"
     destination = ".chef/${var.hostname}.${var.domain}.key"
   }
   # Put certificate
   provisioner "file" {
-    source = "${var.ssl_cert}"
+    source      = "${var.ssl_cert}"
     destination = ".chef/${var.hostname}.${var.domain}.pem"
+  }
+  # Put .license.accepted
+  provisioner "file" {
+    source      = ".chef/.license.accepted"
+    destination = ".chef/.license.accepted"
   }
   # Write .chef/dna.json for chef-solo run
   provisioner "remote-exec" {
@@ -171,32 +188,16 @@ resource "aws_instance" "chef-server" {
       "sudo mv .chef/${var.hostname}.${var.domain}.* /var/chef/ssl/"
     ]
   }
-}
-#
-# Accept Chef MLSA
-#
-resource "null_resource" "chef_mlsa" {
-  depends_on = ["aws_instance.chef-server"]
-  count = "${var.accept_license}"
-  connection {
-    host        = "${aws_instance.chef-server.public_ip}"
-    user        = "${lookup(var.ami_usermap, var.ami_os)}"
-    private_key = "${var.aws_private_key_file}"
-  }
+  # Move in .license.accepted
   provisioner "remote-exec" {
     inline = [
       "sudo mkdir -p /var/opt/chef-manage /var/opt/opscode-push-jobs-server /var/opt/opscode-reporting",
-      "sudo touch /var/opt/chef-manage/.license.accepted /var/opt/opscode-push-jobs-server/.license.accepted /var/opt/opscode-reporting/.license.accepted",
+      "sudo cp .chef/.license.accepted /var/opt/chef-manage/.license.accepted",
+      "sudo cp .chef/.license.accepted /var/opt/opscode-push-jobs-server/.license.accepted",
+      "sudo cp .chef/.license.accepted /var/opt/opscode-reporting/.license.accepted",
+      "rm .chef/.license.accepted",
       "echo 'Chef MLSA Accepted: https://www.chef.io/online-master-agreement/'"
     ]
-  }
-}
-resource "null_resource" "chef_server" {
-  depends_on = ["aws_instance.chef-server"]
-  connection {
-    host        = "${aws_instance.chef-server.public_ip}"
-    user        = "${lookup(var.ami_usermap, var.ami_os)}"
-    private_key = "${var.aws_private_key_file}"
   }
   # Run chef-solo and get us a Chef server
   provisioner "remote-exec" {
@@ -262,7 +263,7 @@ module "validator" {
 }
 # Register Chef server against itself
 resource "null_resource" "chef_chef-server" {
-  depends_on = ["aws_instance.chef-server","null_resource.chef_mlsa","null_resource.chef_server"]
+  depends_on = ["aws_instance.chef-server"]
   connection {
     host        = "${aws_instance.chef-server.public_ip}"
     user        = "${lookup(var.ami_usermap, var.ami_os)}"
