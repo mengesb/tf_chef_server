@@ -113,7 +113,8 @@ resource "aws_instance" "chef-server" {
   vpc_security_group_ids = ["${aws_security_group.chef-server.id}"]
   key_name      = "${var.aws_key_name}"
   tags = {
-    Name        = "${var.hostname}.${var.domain} /"
+    Name        = "${var.hostname}.${var.domain}"
+    Description = "${var.tag_description}"
   }
   root_block_device = {
     delete_on_termination = "${var.root_delete_termination}"
