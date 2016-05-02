@@ -4,6 +4,7 @@
      "init_style": "none"
    },
   "chef-server": {
+    "accept_license": ${license},
     "addons": [
       "manage",
       "push-jobs-server",
@@ -11,7 +12,8 @@
     ],
     "api_fqdn": "${host}.${domain}",
     "configuration": "nginx['ssl_certificate'] = '/var/chef/ssl/${host}.${domain}.pem'\nnginx['ssl_certificate_key'] = '/var/chef/ssl/${host}.${domain}.key'",
-    "topology": "standalone"
+    "topology": "standalone",
+    "version": "${version}"
   },
   "firewall": {
     "allow_established": true,
