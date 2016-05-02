@@ -119,10 +119,6 @@ resource "aws_instance" "chef-server" {
     delete_on_termination = "${var.root_delete_termination}"
     volume_size = "${var.root_volume_size}"
     volume_type = "${var.root_volume_type}"
-    tags = {
-      Name        = "${var.hostname}.${var.domain}"
-      Description = "${var.tag_description}"
-    }
   }
   connection {
     host        = "${self.public_ip}"
