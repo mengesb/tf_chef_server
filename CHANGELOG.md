@@ -3,6 +3,14 @@ tf_chef_server CHANGELOG
 
 This file is used to list changes made in each version of the tf_chef_server Terraform plan.
 
+v1.1.2 (2016-05-02)
+-------------------
+- [Brian Menges] - Remove dependency on `null_resource.chef_mlsa` (deleted resource)
+
+v1.1.1 (2016-05-02)
+-------------------
+- [Brian Menges] - [README.md](README.md) update
+
 v1.1.0 (2016-05-02)
 -------------------
 - [Brian Menges] - Replaced `accept_license` numeric with boolean. Now part of `template_file.attributes-json`
