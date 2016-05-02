@@ -27,6 +27,8 @@ module "module_name_here" {
   source = "github.com/mengesb/tf_chef_server"
   aws_access_key = "<key>"
   ...
+  accept_license = true
+  ...
 }
 ```
 
@@ -67,7 +69,7 @@ These resources will incur charges on your AWS bill. It is your responsibility t
 
 ### tf_chef_server variables
 
-* `accept_license`: [Chef MLSA license](https://www.chef.io/online-master-agreement/) acceptance indicator. Default: `0`; change to `1` to indicate agreement
+* `accept_license`: [Chef MLSA license](https://www.chef.io/online-master-agreement/) agreement. Default: `false`; change to `true` to indicate agreement
 * `allowed_cidrs`: The comma seperated list of addresses in CIDR format to allow SSH access. Default: `0.0.0.0/0`
 * `client_version`: Chef client version. Default: `12.8.1`
 * `domain`: Server's basename. Default: `localhost`
@@ -77,7 +79,10 @@ These resources will incur charges on your AWS bill. It is your responsibility t
 * `org_short`: Chef organization to create. Default: `chef`
 * `org_long`: Chef organization long name. Default: `Chef Organization`
 * `root_delete_termination`: Delete root device on VM termination. Default: `true`
+* `root_volume_size`: Size of the root volume in GB. Default: `20`
+* `root_volume_type`: Type of root volume. Supports `gp2` and `standard`. Default `standard`
 * `server_count`: Server count. Default: `1`; DO NOT CHANGE!
+* `server_version`: Chef Server version to install. Default `12.6.0`
 * `ssl_cert`: SSL certificate in PEM format
 * `ssl_key`: SSL certificate key
 * `tag_description`: Text field tag 'Description'
