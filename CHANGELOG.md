@@ -3,6 +3,17 @@ tf_chef_server CHANGELOG
 
 This file is used to list changes made in each version of the tf_chef_server Terraform plan.
 
+v1.1.0 (2016-05-02)
+-------------------
+- [Brian Menges] - Replaced `accept_license` numeric with boolean. Now part of `template_file.attributes-json`
+- [Brian Menges] - Added `volume_size` and `volume_type` specifications and `root_` variables for mentioned tunables to instance deployted
+- [Brian Menges] - Removed `null_resource` for Chef MLSA handles
+- [Brian Menges] - Added `server_version` to specify Chef Server installation version
+- [Brian Menges] - Set default `root_volume_size` to 20 GB
+- [Brian Menges] - Set default `root_volume_type` to `standard`
+- [Brian Menges] - Added Name tag to `root_block_device` of `${var.hostname}.${var.domain} /`
+- [Brian Menges] - NOTE: incompatible with root type `io1`
+
 v1.0.6 (2016-04-28)
 -------------------
 - [Brian Menges] - Attempt simplier method to `accept_license`

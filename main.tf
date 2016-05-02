@@ -84,9 +84,11 @@ resource "null_resource" "chef-prep" {
 resource "template_file" "attributes-json" {
   template = "${file("${path.module}/files/attributes-json.tpl")}"
   vars {
-    host   = "${var.hostname}"
-    domain = "${var.domain}"
-    user   = "${lookup(var.ami_usermap, var.ami_os)}"
+    license = "${var.accept_license}"
+    host    = "${var.hostname}"
+    domain  = "${var.domain}"
+    user    = "${lookup(var.ami_usermap, var.ami_os)}"
+    version = "${var.server_version}"
   }
 }
 # knife.rb templating
@@ -96,18 +98,6 @@ resource "template_file" "knife-rb" {
     user   = "${var.username}"
     fqdn   = "${var.hostname}.${var.domain}"
     org    = "${var.org_short}"
-  }
-}
-#
-# Accept Chef MLSA
-#
-resource "null_resource" "chef_mlsa" {
-  depends_on = ["null_resource.chef-prep"]
-  count = "${var.accept_license}"
-  provisioner "local-exec" {
-    command = <<-EOC
-      touch .chef/.license.accepted
-      EOC
   }
 }
 #
@@ -122,14 +112,17 @@ resource "aws_instance" "chef-server" {
   subnet_id     = "${var.aws_subnet_id}"
   vpc_security_group_ids = ["${aws_security_group.chef-server.id}"]
   key_name      = "${var.aws_key_name}"
-  # AWS tagging
   tags = {
-    Name        = "${var.hostname}.${var.domain}"
-    Description = "${var.tag_description}"
+    Name        = "${var.hostname}.${var.domain} /"
   }
-  # Delete root on termination
   root_block_device = {
     delete_on_termination = "${var.root_delete_termination}"
+    volume_size = "${var.root_volume_size}"
+    volume_type = "${var.root_volume_type}"
+    tags = {
+      Name        = "${var.hostname}.${var.domain}"
+      Description = "${var.tag_description}"
+    }
   }
   connection {
     host        = "${self.public_ip}"
@@ -148,7 +141,7 @@ resource "aws_instance" "chef-server" {
       "echo 'Version ${var.client_version} of chef-client installed'"
     ]
   }
-  # Copy to server script to download necessary cookbooks
+  # Copy script to download necessary cookbooks
   provisioner "file" {
     source = "${path.module}/files/chef-cookbooks.sh"
     destination = ".chef/chef-cookbooks.sh"
@@ -169,11 +162,6 @@ resource "aws_instance" "chef-server" {
     source      = "${var.ssl_cert}"
     destination = ".chef/${var.hostname}.${var.domain}.pem"
   }
-  # Put .license.accepted
-  provisioner "file" {
-    source      = ".chef/.license.accepted"
-    destination = ".chef/.license.accepted"
-  }
   # Write .chef/dna.json for chef-solo run
   provisioner "remote-exec" {
     inline = [
@@ -186,17 +174,6 @@ resource "aws_instance" "chef-server" {
   provisioner "remote-exec" {
     inline = [
       "sudo mv .chef/${var.hostname}.${var.domain}.* /var/chef/ssl/"
-    ]
-  }
-  # Move in .license.accepted
-  provisioner "remote-exec" {
-    inline = [
-      "sudo mkdir -p /var/opt/chef-manage /var/opt/opscode-push-jobs-server /var/opt/opscode-reporting",
-      "sudo cp .chef/.license.accepted /var/opt/chef-manage/.license.accepted",
-      "sudo cp .chef/.license.accepted /var/opt/opscode-push-jobs-server/.license.accepted",
-      "sudo cp .chef/.license.accepted /var/opt/opscode-reporting/.license.accepted",
-      "rm .chef/.license.accepted",
-      "echo 'Chef MLSA Accepted: https://www.chef.io/online-master-agreement/'"
     ]
   }
   # Run chef-solo and get us a Chef server
