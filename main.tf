@@ -104,7 +104,7 @@ resource "template_file" "knife-rb" {
 # Provision server
 #
 resource "aws_instance" "chef-server" {
-  depends_on    = ["null_resource.chef-prep","null_resource.chef_mlsa"]
+  depends_on    = ["null_resource.chef-prep"]
   ami           = "${lookup(var.ami_map, "${var.ami_os}-${var.aws_region}")}"
   count         = "${var.server_count}"
   instance_type = "${var.aws_flavor}"
