@@ -1,0 +1,37 @@
+# terraform.tfvars.example
+# AWS settings
+#
+aws_access_key       = ""
+#aws_flavor           = ""
+aws_key_name         = ""
+aws_private_key_file = ""
+aws_region           = ""
+aws_secret_key       = ""
+aws_subnet_id        = ""
+aws_vpc_id           = ""
+#
+# tf_chef_server settings
+#
+#accept_license       = "true"
+#allowed_cidrs        = ""
+#ami_os               = ""
+#client_version       = ""
+#domain               = ""
+#hostname             = ""
+#log_to_file          = ""
+#org_short            = ""
+#org_long             = ""
+#public_ip            = ""
+#root_delete_termination = ""
+#root_volume_size     = ""
+#root_volume_type     = ""
+#server_addons        = ""
+#server_count         = ""
+#server_version       = ""
+#ssl_cert             = ""
+#ssl_key              = ""
+#tag_description      = ""
+#username             = ""
+#user_email           = ""
+#user_firstname       = ""
+#user_lastname        = ""

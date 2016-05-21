@@ -84,10 +84,10 @@ resource "null_resource" "chef-prep" {
 resource "template_file" "attributes-json" {
   template = "${file("${path.module}/files/attributes-json.tpl")}"
   vars {
-    license = "${var.accept_license}"
-    host    = "${var.hostname}"
+    addons  = "${join(",", formatlist("\\"%s\\"", split(",", var.server_addons)))}"
     domain  = "${var.domain}"
-    user    = "${lookup(var.ami_usermap, var.ami_os)}"
+    host    = "${var.hostname}"
+    license = "${var.accept_license}"
     version = "${var.server_version}"
   }
 }
@@ -128,26 +128,18 @@ resource "aws_instance" "chef-server" {
   }
   # Setup
   provisioner "remote-exec" {
+    script = "${path.module}/files/disable_firewall.sh"
+  }
+  provisioner "remote-exec" {
     inline = [
       "mkdir -p .chef",
-      "sudo mkdir -p /var/chef/cache /var/chef/cookbooks /var/chef/ssl",
-      "sudo service iptables stop",
-      "sudo chkconfig iptables off",
-      "sudo ufw disable",
       "curl -L https://omnitruck.chef.io/install.sh | sudo bash -s -- -v ${var.client_version}",
       "echo 'Version ${var.client_version} of chef-client installed'"
     ]
   }
-  # Copy script to download necessary cookbooks
-  provisioner "file" {
-    source = "${path.module}/files/chef-cookbooks.sh"
-    destination = ".chef/chef-cookbooks.sh"
-  }
-  # Run script to download necessary cookbooks
+  # Execute script to download necessary cookbooks
   provisioner "remote-exec" {
-    inline = [
-      "bash .chef/chef-cookbooks.sh",
-    ]
+    script = "${path.module}/files/chef-cookbooks.sh"
   }
   # Put certificate key
   provisioner "file" {
@@ -207,7 +199,7 @@ resource "aws_instance" "chef-server" {
   }
   # Upload knife.rb
   provisioner "file" {
-    source = ".chef/knife.rb"
+    source      = ".chef/knife.rb"
     destination = ".chef/knife.rb"
   }
   # Push in cookbooks
@@ -281,4 +273,3 @@ resource "null_resource" "write-files" {
       EOC
   }
 }
-

@@ -35,10 +35,11 @@ module "module_name_here" {
 ### Directly
 
 1. Clone this repo: `git clone https://github.com/mengesb/tf_chef_server.git`
-2. Get dependencies: `terraform get`
-3. Generate and poulate a local `terraform.tfvars` to not be prompted for all inputs
-4. Test the plan: `terraform plan`
-5. Apply the plan: `terraform apply`
+2. Make a local terraform.tfvars file: `cp terraform.tfvars.example terraform.tfvars`
+3. Edit `terraform.tfvars` with your editor of choice, ensuring `accept_license` is set to `true`
+4. Get dependencies: `terraform get`
+5. Test the plan: `terraform plan`
+6. Apply the plan: `terraform apply`
 
 ## Supported OSes
 All supported OSes are 64-bit and HVM (though PV should be supported)
@@ -71,7 +72,7 @@ These resources will incur charges on your AWS bill. It is your responsibility t
 
 * `accept_license`: [Chef MLSA license](https://www.chef.io/online-master-agreement/) agreement. Default: `false`; change to `true` to indicate agreement
 * `allowed_cidrs`: The comma seperated list of addresses in CIDR format to allow SSH access. Default: `0.0.0.0/0`
-* `client_version`: Chef client version. Default: `12.8.1`
+* `client_version`: Chef client version. Default: `12.10.24`
 * `domain`: Server's basename. Default: `localhost`
 * `hostname`: Server's basename. Default: `localdomain`
 * `log_to_file`: Log chef-client to file. Default: `true`
@@ -80,7 +81,8 @@ These resources will incur charges on your AWS bill. It is your responsibility t
 * `org_long`: Chef organization long name. Default: `Chef Organization`
 * `root_delete_termination`: Delete root device on VM termination. Default: `true`
 * `root_volume_size`: Size of the root volume in GB. Default: `20`
-* `root_volume_type`: Type of root volume. Supports `gp2` and `standard`. Default `standard`
+* `root_volume_type`: Type of root volume. Supports `gp2` and `standard`. Default: `standard`
+* `server_addons`: Comma seperated list of addons to install. Default: `manage,push-jobs-server,reporting`
 * `server_count`: Server count. Default: `1`; DO NOT CHANGE!
 * `server_version`: Chef Server version to install. Default `12.6.0`
 * `ssl_cert`: SSL certificate in PEM format
