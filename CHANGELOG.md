@@ -3,6 +3,19 @@ tf_chef_server CHANGELOG
 
 This file is used to list changes made in each version of the tf_chef_server Terraform plan.
 
+v1.2.0 (2016-05-20)
+-------------------
+- [Brian Menges] - Updated `client_version` to `12.10.24`
+- [Brian Menges] - Some small text alignment updates
+- [Brian Menges] - Replaced remote-exec for firewall disables with a script [disable_firewall.sh](files/disable_firewall.sh)
+- [Brian Menges] - Replaced upload and execute for [chef-cookbooks.sh](files/chef-cookbooks.sh) with remote-execute script
+- [Brian Menges] - Tidy up code in [chef-cookbooks.sh](files/chef-cookbooks.sh)
+- [Brian Menges] - Ordered variables in `template_file.attributes-json`
+- [Brian Menges] - Removed unused variables in `template_file.attributes-json`
+- [Brian Menges] - Added `server_addons` variable and input into `template_file.attributes-json` as `addons`
+- [Brian Menges] - Added [terraform.tfvars.example](terraform.tfvars.example) to provide an example for `terraform.tfvars`
+- [Brian Menges] - Documentation updates
+
 v1.1.4 (2016-05-02)
 -------------------
 - [Brian Menges] - BUG: Fixed aws_instance tag

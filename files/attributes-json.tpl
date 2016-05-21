@@ -5,11 +5,7 @@
    },
   "chef-server": {
     "accept_license": ${license},
-    "addons": [
-      "manage",
-      "push-jobs-server",
-      "reporting"
-    ],
+    "addons": [${addons}],
     "api_fqdn": "${host}.${domain}",
     "configuration": "nginx['ssl_certificate'] = '/var/chef/ssl/${host}.${domain}.pem'\nnginx['ssl_certificate_key'] = '/var/chef/ssl/${host}.${domain}.key'",
     "topology": "standalone",

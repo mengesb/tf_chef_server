@@ -112,7 +112,7 @@ variable "allowed_cidrs" {
 }
 variable "client_version" {
   description = "Version of the chef-client software to install"
-  default     = "12.8.1"
+  default     = "12.10.24"
 }
 variable "domain" {
   description = "Chef server domain name"
@@ -150,6 +150,10 @@ variable "root_volume_type" {
   description = "Type of root volume"
   default     = "standard"
 }
+variable "server_addons" {
+  description = "Addons to install to Chef Server"
+  default     = "manage,push-jobs-server,reporting"
+}
 variable "server_count" {
   description = "Number of Chef Servers to provision. DO NOT CHANGE!"
   default     = 1
@@ -184,4 +188,3 @@ variable "user_lastname" {
   description = "Chef server first user's last name"
   default     = "User"
 }
-
