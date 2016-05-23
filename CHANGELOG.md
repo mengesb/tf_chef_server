@@ -3,6 +3,11 @@ tf_chef_server CHANGELOG
 
 This file is used to list changes made in each version of the tf_chef_server Terraform plan.
 
+v1.2.1 (2016-05-23)
+-------------------
+- [Brian Menges] - Added a [CONTRIBUTING](CONTRIBUTING.md) document
+- [Brian Menges] - Updated [README.md](README.md) to refer to [CONTRIBUTING](CONTRIBUTING.md) document
+
 v1.2.0 (2016-05-20)
 -------------------
 - [Brian Menges] - Updated `client_version` to `12.10.24`

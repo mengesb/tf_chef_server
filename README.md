@@ -157,7 +157,7 @@ You can view a runtime output sample here: [tf_chef_server-runtime.txt](https://
 
 ## Contributing
 
-Please understand that this is a work in progress and is subject to change rapidly. Please be sure to keep up to date with the repo should you fork, and feel free to contact me regarding development and suggested direction
+Please understand that this is a work in progress and is subject to change rapidly. Be sure to keep up to date with the repo should you fork, and feel free to contact me regarding development and suggested direction. Familiarize yoursef with the [contributing](CONTRIBUTING.md) before making/submitting changes.
 
 ## `CHANGELOG`
 
