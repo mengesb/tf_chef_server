@@ -3,8 +3,6 @@ log_level                :info
 log_location             STDOUT
 node_name                '${user}'
 client_key               "#{current_dir}/${user}.pem"
-validation_client_name   '${org}-validator'
-validation_key           "#{current_dir}/${org}-validator.pem"
 chef_server_url          'https://${fqdn}/organizations/${org}'
 cache_type               'BasicFile'
 cache_options( :path => "#{current_dir}/checksums" )

@@ -81,7 +81,7 @@ resource "null_resource" "chef-prep" {
   }
 }
 # Chef provisiong attributes_json and .chef/dna.json templating
-resource "template_file" "attributes-json" {
+data "template_file" "attributes-json" {
   template = "${file("${path.module}/files/attributes-json.tpl")}"
   vars {
     addons  = "${join(",", formatlist("\\"%s\\"", split(",", var.server_addons)))}"
@@ -92,7 +92,7 @@ resource "template_file" "attributes-json" {
   }
 }
 # knife.rb templating
-resource "template_file" "knife-rb" {
+data "template_file" "knife-rb" {
   template = "${file("${path.module}/files/knife-rb.tpl")}"
   vars {
     user   = "${var.username}"
@@ -155,7 +155,7 @@ resource "aws_instance" "chef-server" {
   provisioner "remote-exec" {
     inline = [
       "cat > .chef/dna.json <<EOF",
-      "${template_file.attributes-json.rendered}",
+      "${data.template_file.attributes-json.rendered}",
       "EOF",
     ]
   }
@@ -193,7 +193,7 @@ resource "aws_instance" "chef-server" {
     command = <<-EOC
       [ -f .chef/knife.rb ] && rm -f .chef/knife.rb
       cat > .chef/knife.rb <<EOF
-      ${template_file.knife-rb.rendered}
+      ${data.template_file.knife-rb.rendered}
       EOF
       EOC
   }
@@ -223,10 +223,6 @@ module "user_pem" {
   source = "github.com/mengesb/tf_filemodule"
   file   = ".chef/${var.username}.pem"
 }
-module "validator" {
-  source = "github.com/mengesb/tf_filemodule"
-  file   = ".chef/${var.org_short}-validator.pem"
-}
 # Register Chef server against itself
 resource "null_resource" "chef_chef-server" {
   depends_on = ["aws_instance.chef-server"]
@@ -237,20 +233,20 @@ resource "null_resource" "chef_chef-server" {
   }
   # Provision with Chef
   provisioner "chef" {
-    attributes_json = "${template_file.attributes-json.rendered}"
+    attributes_json = "${data.template_file.attributes-json.rendered}"
     environment     = "_default"
     log_to_file     = "${var.log_to_file}"
     node_name       = "${aws_instance.chef-server.tags.Name}"
     run_list        = ["recipe[system::default]","recipe[chef-client::default]","recipe[chef-client::config]","recipe[chef-client::cron]","recipe[chef-client::delete_validation]","recipe[chef-server::default]","recipe[chef-server::addons]"]
     server_url      = "https://${aws_instance.chef-server.tags.Name}/organizations/${var.org_short}"
     skip_install    = true
-    validation_client_name = "${var.org_short}-validator"
-    validation_key  = "${file("${module.validator.file}")}"
+    user_name       = "${var.username}"
+    user_key        = "${module.user_pem.file}"
     version         = "${var.client_version}"
   }
 }
 # Generate pretty output format
-resource "template_file" "chef-server-creds" {
+data "template_file" "chef-server-creds" {
   depends_on = ["null_resource.chef_chef-server"]
   template = "${file("${path.module}/files/chef-server-creds.tpl")}"
   vars {
@@ -259,7 +255,6 @@ resource "template_file" "chef-server-creds" {
     user_p = "${module.user_pem.file}"
     fqdn   = "${aws_instance.chef-server.tags.Name}"
     org    = "${var.org_short}"
-    pem    = "${module.validator.file}"
   }
 }
 # Write generated template file
@@ -268,7 +263,7 @@ resource "null_resource" "write-files" {
     command = <<-EOC
       [ -f .chef/chef-server.creds ] && rm -f .chef/chef-server.creds
       cat > .chef/chef-server.creds <<EOF
-      ${template_file.chef-server-creds.rendered}
+      ${data.template_file.chef-server-creds.rendered}
       EOF
       EOC
   }
