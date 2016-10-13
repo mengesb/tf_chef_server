@@ -1,37 +1,60 @@
-# terraform.tfvars.example
-# AWS settings
+# terraform.tfvars
 #
-aws_access_key       = ""
-#aws_flavor           = ""
-aws_key_name         = ""
-aws_private_key_file = ""
-aws_region           = ""
-aws_secret_key       = ""
-aws_subnet_id        = ""
-aws_vpc_id           = ""
+# AWS Settings
+#
+aws = {
+  access_key       = ""
+  secret_key       = ""
+}
+aws_network        = {
+  subnet           = ""
+  vpc              = ""
+}
+#aws_region         = "us-west-1"
+#
+# AWS AMI Settings
+#
+#ami_map            = {}
+#ami_os             = "ubuntu14"
+#ami_usermap        = {}
 #
 # tf_chef_server settings
 #
-#accept_license       = "true"
-#allowed_cidrs        = ""
-#ami_os               = ""
-#client_version       = ""
-#domain               = ""
-#hostname             = ""
-#log_to_file          = ""
-#org_short            = ""
-#org_long             = ""
-#public_ip            = ""
-#root_delete_termination = ""
-#root_volume_size     = ""
-#root_volume_type     = ""
-#server_addons        = ""
-#server_count         = ""
-#server_version       = ""
-#ssl_cert             = ""
-#ssl_key              = ""
-#tag_description      = ""
-#username             = ""
-#user_email           = ""
-#user_firstname       = ""
-#user_lastname        = ""
+#allowed_cidrs      = "0.0.0.0/0"
+#chef_addons        = "manage,push-jobs-server,reporting"
+chef_license       = "false"
+#chef_log           = "true"
+#chef_org           = {
+#  short            = "chef"
+#  long             = "Chef Organization"
+#}
+chef_ssl           = {
+  cert             = ""
+  key              = ""
+}
+#chef_user          = {
+#  email            = "chef.admin@domain.tld"
+#  first            = "Chef"
+#  last             = "Admin
+#  username         = "chefadmin"
+#}
+#chef_versions      = {
+#  client           = "12.15.19"
+#  server           = "12.9.1"
+#}
+#instance           = {
+#  hostname         = ""
+#  domain           = ""
+#}
+#instance_flavor    = "c3.xlarge"
+instance_key       = {
+  file             = ""
+  name             = ""
+}
+#instance_public    = ""
+#instance_tag_desc  = ""
+#instance_volume    = {}
+#  size             = "20"
+#  type             = "gp2"
+#  delete           = "true"
+#}

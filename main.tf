@@ -1,10 +1,10 @@
 # Chef Server AWS security group - https://docs.chef.io/server_firewalls_and_ports.html
 resource "aws_security_group" "chef-server" {
-  name        = "${var.hostname}.${var.domain} security group"
-  description = "Chef Server ${var.hostname}.${var.domain}"
-  vpc_id      = "${var.aws_vpc_id}"
+  name        = "${var.instance["hostname"]}.${var.instance["domain"]} security group"
+  description = "Chef Server ${var.instance["hostname"]}.${var.instance["domain"]}"
+  vpc_id      = "${var.aws_network["vpc"]}"
   tags = {
-    Name      = "${var.hostname}.${var.domain} security group"
+    Name      = "${var.instance["hostname"]}.${var.instance["domain"]} security group"
   }
 }
 # SSH
@@ -63,8 +63,8 @@ resource "aws_security_group_rule" "chef-server_allow_egress" {
 }
 # AWS settings
 provider "aws" {
-  access_key = "${var.aws_access_key}"
-  secret_key = "${var.aws_secret_key}"
+  access_key = "${var.aws["access_key"]}"
+  secret_key = "${var.aws["secret_key"]}"
   region     = "${var.aws_region}"
 }
 #
@@ -73,8 +73,7 @@ provider "aws" {
 resource "null_resource" "chef-prep" {
   provisioner "local-exec" {
     command = <<-EOF
-      rm -rf .chef
-      mkdir -p .chef
+      [ -f .chef/encrypted_data_bag_secret ] && rm -f .chef/encrypted_data_bag_secret
       openssl rand -base64 512 | tr -d '\r\n' > .chef/encrypted_data_bag_secret
       echo "Local prep complete"
       EOF
@@ -84,85 +83,82 @@ resource "null_resource" "chef-prep" {
 data "template_file" "attributes-json" {
   template = "${file("${path.module}/files/attributes-json.tpl")}"
   vars {
-    addons  = "${join(",", formatlist("\\"%s\\"", split(",", var.server_addons)))}"
-    domain  = "${var.domain}"
-    host    = "${var.hostname}"
-    license = "${var.accept_license}"
-    version = "${var.server_version}"
+    addons  = "${join(",", formatlist("\\"%s\\"", split(",", var.chef_addons)))}"
+    domain  = "${var.instance["domain"]}"
+    host    = "${var.instance["hostname"]}"
+    license = "${var.chef_license}"
+    version = "${var.chef_versions["server"]}"
   }
 }
 # knife.rb templating
 data "template_file" "knife-rb" {
   template = "${file("${path.module}/files/knife-rb.tpl")}"
   vars {
-    user   = "${var.username}"
-    fqdn   = "${var.hostname}.${var.domain}"
-    org    = "${var.org_short}"
+    user   = "${var.chef_user["username"]}"
+    fqdn   = "${var.instance["hostname"]}.${var.instance["domain"]}"
+    org    = "${var.chef_org["short"]}"
   }
 }
 #
 # Provision server
 #
 resource "aws_instance" "chef-server" {
-  depends_on    = ["null_resource.chef-prep"]
-  ami           = "${lookup(var.ami_map, "${var.ami_os}-${var.aws_region}")}"
-  count         = "${var.server_count}"
-  instance_type = "${var.aws_flavor}"
-  associate_public_ip_address = "${var.public_ip}"
-  subnet_id     = "${var.aws_subnet_id}"
+  depends_on       = ["null_resource.chef-prep"]
+  ami              = "${lookup(var.ami_map, "${var.ami_os}-${var.aws_region}")}"
+  count            = 1
+  instance_type    = "${var.instance_flavor}"
+  associate_public_ip_address = "${var.instance_public}"
+  subnet_id        = "${var.aws_network["subnet"]}"
   vpc_security_group_ids = ["${aws_security_group.chef-server.id}"]
-  key_name      = "${var.aws_key_name}"
-  tags = {
-    Name        = "${var.hostname}.${var.domain}"
-    Description = "${var.tag_description}"
+  key_name         = "${var.instance_key["name"]}"
+  tags             = {
+    Name           = "${var.instance["hostname"]}.${var.instance["domain"]}"
+    Description    = "${var.instance_tag_desc}"
   }
   root_block_device = {
-    delete_on_termination = "${var.root_delete_termination}"
-    volume_size = "${var.root_volume_size}"
-    volume_type = "${var.root_volume_type}"
+    delete_on_termination = "${var.instance_volume["delete"]}"
+    volume_size    = "${var.instance_volume["size"]}"
+    volume_type    = "${var.instance_volume["type"]}"
   }
   connection {
-    host        = "${self.public_ip}"
-    user        = "${lookup(var.ami_usermap, var.ami_os)}"
-    private_key = "${var.aws_private_key_file}"
+    host           = "${self.public_ip}"
+    user           = "${lookup(var.ami_usermap, var.ami_os)}"
+    private_key    = "${file("${var.instance_key["file"]}")}"
   }
   # Setup
   provisioner "remote-exec" {
-    script = "${path.module}/files/disable_firewall.sh"
+    script         = "${path.module}/files/disable_firewall.sh"
   }
   provisioner "remote-exec" {
     inline = [
       "mkdir -p .chef",
-      "curl -L https://omnitruck.chef.io/install.sh | sudo bash -s -- -v ${var.client_version}",
-      "echo 'Version ${var.client_version} of chef-client installed'"
+      "curl -L https://omnitruck.chef.io/install.sh | sudo bash -s -- -v ${var.chef_versions["client"]}",
+      "echo 'Version ${var.chef_versions["client"]} of chef-client installed'"
     ]
   }
   # Execute script to download necessary cookbooks
   provisioner "remote-exec" {
-    script = "${path.module}/files/chef-cookbooks.sh"
+    script         = "${path.module}/files/chef-cookbooks.sh"
   }
   # Put certificate key
   provisioner "file" {
-    source      = "${var.ssl_key}"
-    destination = ".chef/${var.hostname}.${var.domain}.key"
+    source         = "${var.chef_ssl["key"]}"
+    destination    = ".chef/${var.instance["hostname"]}.${var.instance["domain"]}.key"
   }
   # Put certificate
   provisioner "file" {
-    source      = "${var.ssl_cert}"
-    destination = ".chef/${var.hostname}.${var.domain}.pem"
+    source         = "${var.chef_ssl["cert"]}"
+    destination    = ".chef/${var.instance["hostname"]}.${var.instance["domain"]}.pem"
   }
   # Write .chef/dna.json for chef-solo run
-  provisioner "remote-exec" {
-    inline = [
-      "cat > .chef/dna.json <<EOF",
-      "${data.template_file.attributes-json.rendered}",
-      "EOF",
-    ]
+  provisioner "file" {
+    content        = "${data.template_file.attributes-json.rendered}"
+    destination    = ".chef/dna.json"
   }
   # Move certs
   provisioner "remote-exec" {
     inline = [
-      "sudo mv .chef/${var.hostname}.${var.domain}.* /var/chef/ssl/"
+      "sudo mv .chef/${var.instance["hostname"]}.${var.instance["domain"]}.* /var/chef/ssl/"
     ]
   }
   # Run chef-solo and get us a Chef server
@@ -174,8 +170,8 @@ resource "aws_instance" "chef-server" {
   # Create first user and org
   provisioner "remote-exec" {
     inline = [
-      "sudo chef-server-ctl user-create ${var.username} ${var.user_firstname} ${var.user_lastname} ${var.user_email} ${base64sha256(self.id)} -f .chef/${var.username}.pem",
-      "sudo chef-server-ctl org-create ${var.org_short} '${var.org_long}' --association_user ${var.username} --filename .chef/${var.org_short}-validator.pem",
+      "sudo chef-server-ctl user-create ${var.chef_user["username"]} ${var.chef_user["first"]} ${var.chef_user["last"]} ${var.chef_user["email"]} ${base64sha256(self.id)} -f .chef/${var.chef_user["username"]}.pem",
+      "sudo chef-server-ctl org-create ${var.chef_org["short"]} '${var.chef_org["long"]}' --association_user ${var.chef_user["username"]} --filename .chef/${var.chef_org["short"]}-validator.pem",
     ]
   }
   # Correct ownership on .chef so we can harvest files
@@ -186,7 +182,11 @@ resource "aws_instance" "chef-server" {
   }
   # Copy back .chef files
   provisioner "local-exec" {
-    command = "scp -r -o stricthostkeychecking=no -i ${var.aws_private_key_file} ${lookup(var.ami_usermap, var.ami_os)}@${aws_instance.chef-server.public_ip}:.chef/* .chef/"
+    command = "scp -r -o stricthostkeychecking=no -i ${var.instance_key["file"]} ${lookup(var.ami_usermap, var.ami_os)}@${self.public_ip}:.chef/* .chef/"
+  }
+  # Replace local .chef/user.pem file with generated one
+  provisioner "local-exec" {
+    command = "cp -f .chef/${var.chef_user["username"]}.pem .chef/user.pem"
   }
   # Generate knife.rb
   provisioner "local-exec" {
@@ -199,8 +199,8 @@ resource "aws_instance" "chef-server" {
   }
   # Upload knife.rb
   provisioner "file" {
-    source      = ".chef/knife.rb"
-    destination = ".chef/knife.rb"
+    content        = "${data.template_file.knife-rb.rendered}"
+    destination    = ".chef/knife.rb"
   }
   # Push in cookbooks
   provisioner "remote-exec" {
@@ -210,51 +210,36 @@ resource "aws_instance" "chef-server" {
     ]
   }
 }
-# File sourcing redirection
-module "encrypted_data_bag_secret" {
-  source = "github.com/mengesb/tf_filemodule"
-  file   = ".chef/encrypted_data_bag_secret"
-}
-module "knife_rb" {
-  source = "github.com/mengesb/tf_filemodule"
-  file   = ".chef/knife.rb"
-}
-module "user_pem" {
-  source = "github.com/mengesb/tf_filemodule"
-  file   = ".chef/${var.username}.pem"
-}
 # Register Chef server against itself
 resource "null_resource" "chef_chef-server" {
   depends_on = ["aws_instance.chef-server"]
   connection {
     host        = "${aws_instance.chef-server.public_ip}"
     user        = "${lookup(var.ami_usermap, var.ami_os)}"
-    private_key = "${var.aws_private_key_file}"
+    private_key = "${file("${var.instance_key["file"]}")}"
   }
   # Provision with Chef
   provisioner "chef" {
     attributes_json = "${data.template_file.attributes-json.rendered}"
     environment     = "_default"
-    log_to_file     = "${var.log_to_file}"
+    log_to_file     = "${var.chef_log}"
     node_name       = "${aws_instance.chef-server.tags.Name}"
     run_list        = ["recipe[system::default]","recipe[chef-client::default]","recipe[chef-client::config]","recipe[chef-client::cron]","recipe[chef-client::delete_validation]","recipe[chef-server::default]","recipe[chef-server::addons]"]
-    server_url      = "https://${aws_instance.chef-server.tags.Name}/organizations/${var.org_short}"
+    server_url      = "https://${aws_instance.chef-server.tags.Name}/organizations/${var.chef_org["short"]}"
     skip_install    = true
-    user_name       = "${var.username}"
-    user_key        = "${module.user_pem.file}"
-    version         = "${var.client_version}"
+    user_name       = "${var.chef_user["username"]}"
+    user_key        = "${file(".chef/user.pem")}"
   }
 }
 # Generate pretty output format
 data "template_file" "chef-server-creds" {
-  depends_on = ["null_resource.chef_chef-server"]
   template = "${file("${path.module}/files/chef-server-creds.tpl")}"
   vars {
-    user   = "${var.username}"
+    user   = "${var.chef_user["username"]}"
     pass   = "${base64sha256(aws_instance.chef-server.id)}"
-    user_p = "${module.user_pem.file}"
+    user_p = ".chef/${var.chef_user["username"]}.pem"
     fqdn   = "${aws_instance.chef-server.tags.Name}"
-    org    = "${var.org_short}"
+    org    = "${var.chef_org["short"]}"
   }
 }
 # Write generated template file
