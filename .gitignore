@@ -2,4 +2,6 @@ terraform.tfstate*
 terraform.tfvars
 .terraform
 *.swp*
+.chef
+!.chef/.gitkeep
 logfiles
