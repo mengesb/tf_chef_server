@@ -3,6 +3,23 @@ tf_chef_server CHANGELOG
 
 This file is used to list changes made in each version of the tf_chef_server Terraform plan.
 
+v2.0.0 (2016-10-13)
+-------------------
+- [Brian Menges] - Add missing dependent cookbook to [files/chef-cookbooks.sh]
+- [Brian Menges] - Convert several string variables to maps
+- [Brian Menges] - Remove `tf_filemodule` dependency
+- [Brian Menges] - Update Ubuntu 14.04 LTS AMI list in `ami_map`
+- [Brian Menges] - Update `remote-exec` provisioner writes of template files to `file` provisioner with `content`
+- [Brian Menges] - Update [terraform.tfvars.example] with current variables and defaults
+- [Brian Menges] - Set default AMI os to Ubuntu 14.04 LTS
+- [Brian Menges] - Removed CentOS 6 from `ami_map`. Root partition resize required to support installation
+- [Seth Larson] - Fix `private_key` call in `connection` directive, required `file()` interpolation
+
+v1.3.0 (2016-10-12)
+-------------------
+- [Brian Menges] - Syntax updates for Terraform v0.7.5
+- [Brian Menges] - Chef provider updates
+
 v1.2.1 (2016-05-23)
 -------------------
 - [Brian Menges] - Added a [CONTRIBUTING](CONTRIBUTING.md) document
