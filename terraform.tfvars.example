@@ -35,7 +35,7 @@ chef_ssl           = {
 #chef_user          = {
 #  email            = "chef.admin@domain.tld"
 #  first            = "Chef"
-#  last             = "Admin
+#  last             = "Admin"
 #  username         = "chefadmin"
 #}
 #chef_versions      = {
