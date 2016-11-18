@@ -4,4 +4,5 @@ terraform.tfvars
 *.swp*
 .chef
 !.chef/.gitkeep
+.kitchen
 logfiles

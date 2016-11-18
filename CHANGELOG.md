@@ -3,6 +3,13 @@ tf_chef_server CHANGELOG
 
 This file is used to list changes made in each version of the tf_chef_server Terraform plan.
 
+v2.0.2 (2016-11-18)
+-------------------
+- [Julian Dunn] - Fix [terraform.tfvars.example] missing double quote
+- [Julian Dunn] - Stringify the booleans (hashicorp/terraform#9751)
+- [Brian Menges] - Update chef client and server versions to latest
+- [Brian Menges] - Add kitchen-terraform and tests
+
 v2.0.0 (2016-10-13)
 -------------------
 - [Brian Menges] - Add missing dependent cookbook to [files/chef-cookbooks.sh]
