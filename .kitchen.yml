@@ -1,0 +1,31 @@
+---
+driver:
+  name: terraform
+
+provisioner:
+  name: terraform
+  apply_timeout: 1000
+  color: true
+  variable_files:
+    - terraform.tfvars
+
+platforms:
+  - name: centos-7
+
+transport:
+  name: ssh
+  ssh_key: ~/.ssh/chef_provisioning
+
+verifier:
+  name: terraform
+  format: doc
+  groups:
+    - name: default
+      tests:
+        - operating_system
+        - chef_server
+      hostnames: public_ip
+      username: ubuntu
+
+suites:
+  - name: default

@@ -143,8 +143,8 @@ variable "chef_versions" {
   type             = "map"
   description      = "Chef software versions"
   default          = {
-    client         = "12.15.19"
-    server         = "12.9.1"
+    client         = "12.16.42"
+    server         = "12.11.1"
   }
 }
 variable "instance" {
