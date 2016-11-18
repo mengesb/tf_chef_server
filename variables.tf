@@ -111,7 +111,7 @@ variable "chef_license" {
 variable "chef_log" {
   #type             = "boolean"
   description      = "Log chef provisioner to file"
-  default          = true
+  default          = "true"
 }
 variable "chef_org" {
   type             = "map"
@@ -171,7 +171,7 @@ variable "instance_key" {
 variable "instance_public" {
   #type             = "boolean"
   description      = "Associate a public IP to the instance"
-  default          = true
+  default          = "true"
 }
 variable "instance_tag_desc" {
   type             = "string"
@@ -182,7 +182,7 @@ variable "instance_volume" {
   type             = "map"
   description      = "EC2 instance root volume settings"
   default          = {
-    delete         = true
+    delete         = "true"
     size           = 20
     type           = "gp2"
   }
