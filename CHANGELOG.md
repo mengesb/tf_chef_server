@@ -3,6 +3,10 @@ tf_chef_server CHANGELOG
 
 This file is used to list changes made in each version of the tf_chef_server Terraform plan.
 
+v2.0.3 (2016-11-18)
+-------------------
+- [Brian Menges] - Fix [.kitchen.yml](.kitchen.yml) platform name
+
 v2.0.2 (2016-11-18)
 -------------------
 - [Julian Dunn] - Fix [terraform.tfvars.example] missing double quote

@@ -10,7 +10,7 @@ provisioner:
     - terraform.tfvars
 
 platforms:
-  - name: centos-7
+  - name: ubuntu-14
 
 transport:
   name: ssh
