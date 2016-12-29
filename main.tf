@@ -131,7 +131,7 @@ resource "aws_instance" "chef-server" {
   }
   provisioner "remote-exec" {
     inline = [
-      "mkdir -p .chef",
+      "mkdir -p .chef/trusted_certs",
       "curl -L https://omnitruck.chef.io/install.sh | sudo bash -s -- -v ${var.chef_versions["client"]}",
       "echo 'Version ${var.chef_versions["client"]} of chef-client installed'"
     ]
