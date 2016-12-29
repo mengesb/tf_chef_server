@@ -235,6 +235,7 @@ resource "null_resource" "chef_chef-server" {
     skip_install    = true
     user_name       = "${var.chef_user["username"]}"
     user_key        = "${file(".chef/user.pem")}"
+    fetch_chef_certificates = true
   }
 }
 # Generate pretty output format
