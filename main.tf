@@ -202,6 +202,11 @@ resource "aws_instance" "chef-server" {
     content        = "${data.template_file.knife-rb.rendered}"
     destination    = ".chef/knife.rb"
   }
+  # Upload ssl cert
+  provisioner "file" {
+    source         = "${var.chef_ssl["cert"]}"
+    destination    = ".chef/trusted_certs/${var.instance["hostname"]}.${var.instance["domain"]}.crt"
+  }
   # Push in cookbooks
   provisioner "remote-exec" {
     inline = [
