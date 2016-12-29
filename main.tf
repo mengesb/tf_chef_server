@@ -205,6 +205,7 @@ resource "aws_instance" "chef-server" {
   # Push in cookbooks
   provisioner "remote-exec" {
     inline = [
+      "sudo knife ssl check",
       "sudo knife cookbook upload -a -c .chef/knife.rb --cookbook-path /var/chef/cookbooks",
       "sudo rm -rf /var/chef/cookbooks",
     ]
