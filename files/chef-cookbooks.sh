@@ -10,7 +10,7 @@ for DEP in compat_resource chef-server  ; do curl -sL https://supermarket.chef.i
 for DEP in chef-sugar cron firewall     ; do curl -sL https://supermarket.chef.io/cookbooks/${DEP}/download | sudo tar xzC /var/chef/cookbooks; done
 for DEP in hostsfile logrotate          ; do curl -sL https://supermarket.chef.io/cookbooks/${DEP}/download | sudo tar xzC /var/chef/cookbooks; done
 for DEP in packagecloud system yum      ; do curl -sL https://supermarket.chef.io/cookbooks/${DEP}/download | sudo tar xzC /var/chef/cookbooks; done
-for DEP in yum-chef windows             ; do curl -sL https://supermarket.chef.io/cookbooks/${DEP}/download | sudo tar xzC /var/chef/cookbooks; done
+for DEP in yum-chef windows ohai        ; do curl -sL https://supermarket.chef.io/cookbooks/${DEP}/download | sudo tar xzC /var/chef/cookbooks; done
 
 sudo chown -R root:root /var/chef
 

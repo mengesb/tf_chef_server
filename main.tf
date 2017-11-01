@@ -131,7 +131,7 @@ resource "aws_instance" "chef-server" {
   }
   provisioner "remote-exec" {
     inline = [
-      "mkdir -p .chef",
+      "mkdir -p .chef/trusted_certs",
       "curl -L https://omnitruck.chef.io/install.sh | sudo bash -s -- -v ${var.chef_versions["client"]}",
       "echo 'Version ${var.chef_versions["client"]} of chef-client installed'"
     ]
@@ -202,9 +202,15 @@ resource "aws_instance" "chef-server" {
     content        = "${data.template_file.knife-rb.rendered}"
     destination    = ".chef/knife.rb"
   }
+  # Upload ssl cert
+  provisioner "file" {
+    source         = "${var.chef_ssl["cert"]}"
+    destination    = ".chef/trusted_certs/${var.instance["hostname"]}.${var.instance["domain"]}.crt"
+  }
   # Push in cookbooks
   provisioner "remote-exec" {
     inline = [
+      "sudo knife ssl check",
       "sudo knife cookbook upload -a -c .chef/knife.rb --cookbook-path /var/chef/cookbooks",
       "sudo rm -rf /var/chef/cookbooks",
     ]
@@ -229,6 +235,7 @@ resource "null_resource" "chef_chef-server" {
     skip_install    = true
     user_name       = "${var.chef_user["username"]}"
     user_key        = "${file(".chef/user.pem")}"
+    fetch_chef_certificates = true
   }
 }
 # Generate pretty output format
